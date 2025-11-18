@@ -1,10 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = 'https://xewnexcvcafepzzeumwa.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhld25leGN2Y2FmZXB6emV1bXdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTU1MTksImV4cCI6MjA3OTA3MTkxOX0.opSMjAk99ZKFhWtCly8gAXzXn-TjJtW8-a2tHFpkTOs';
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { supabase } from '../services/supabase';
 
 const CaseContext = createContext();
 
