@@ -42,6 +42,13 @@ const Layout = () => {
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <Outlet />
       </main>
+      <footer className="bg-white border-t mt-12">
+        <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-sm text-gray-500">
+            Disclaimer: This AI-powered mediation tool is provided for informational purposes only and does not constitute legal advice. Users should consult with qualified legal professionals for any legal matters. The AI mediator facilitates communication but does not guarantee resolution or enforce agreements.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };

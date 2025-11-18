@@ -6,6 +6,7 @@ import Auth from './screens/Auth';
 import Dashboard from './screens/Dashboard';
 import CreateCaseWizard from './screens/CreateCaseWizard';
 import JoinCase from './screens/JoinCase';
+import JoinCasePrompt from './screens/JoinCasePrompt';
 import MediationRoom from './screens/MediationRoom';
 
 function ProtectedRoute({ children }) {
@@ -36,6 +37,13 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <CreateCaseWizard />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/join-case" element={
+            <ProtectedRoute>
+              <Layout>
+                <JoinCasePrompt />
               </Layout>
             </ProtectedRoute>
           } />
