@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
+import { LogIn, UserPlus, Mail, Lock, Chrome } from 'lucide-react';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -44,63 +45,83 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            {isLogin ? 'Sign in to your account' : 'Create your account'}
+        <div className="text-center">
+          <div className="flex justify-center mb-4">
+            {isLogin ? <LogIn className="h-12 w-12 text-primary-600" /> : <UserPlus className="h-12 w-12 text-primary-600" />}
+          </div>
+          <h2 className="text-3xl font-bold text-secondary-900 mb-2">
+            {isLogin ? 'Welcome back!' : 'Join us today!'}
           </h2>
+          <p className="text-secondary-600">
+            {isLogin ? 'Sign in to continue your mediation journey' : 'Create your account to get started'}
+          </p>
         </div>
         <Card className="shadow-xl">
-          <Button onClick={handleGoogleSignIn} className="w-full bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 mb-6">
-            Sign in with Google
+          <Button onClick={handleGoogleSignIn} variant="outline" className="w-full mb-6 flex items-center justify-center gap-2">
+            <Chrome className="h-5 w-5" />
+            Continue with Google
           </Button>
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
+              <div className="w-full border-t border-secondary-300" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+              <span className="px-2 bg-white text-secondary-500">Or continue with email</span>
             </div>
           </div>
           <form onSubmit={handleSubmit} className="space-y-6">
             {!isLogin && (
-              <Input
-                label="Full Name"
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-              />
+              <div className="relative">
+                <Input
+                  label="Full Name"
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                  className="pl-10"
+                />
+                <UserPlus className="absolute left-3 top-9 h-5 w-5 text-secondary-400" />
+              </div>
             )}
-            <Input
-              label="Email address"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-            />
-            <Input
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-            />
+            <div className="relative">
+              <Input
+                label="Email address"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                className="pl-10"
+              />
+              <Mail className="absolute left-3 top-9 h-5 w-5 text-secondary-400" />
+            </div>
+            <div className="relative">
+              <Input
+                label="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+                className="pl-10"
+              />
+              <Lock className="absolute left-3 top-9 h-5 w-5 text-secondary-400" />
+            </div>
             {error && <p className="text-red-600 text-sm">{error}</p>}
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading ? 'Loading...' : (isLogin ? 'Sign In' : 'Sign Up')}
+            <Button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2">
+              {isLogin ? <LogIn className="h-5 w-5" /> : <UserPlus className="h-5 w-5" />}
+              {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
             </Button>
           </form>
           <div className="mt-6 text-center">
             <button
               type="button"
               onClick={() => setIsLogin(!isLogin)}
-              className="text-blue-600 hover:text-blue-500"
+              className="text-primary-600 hover:text-primary-700 font-medium"
             >
-              {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+              {isLogin ? "New here? Create an account" : 'Already have an account? Sign in'}
             </button>
           </div>
         </Card>

@@ -4,6 +4,7 @@ import { useCase } from '../contexts/CaseContext';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
+import { FileText, Users, Settings, Copy, ArrowLeft, ArrowRight } from 'lucide-react';
 
 const CreateCaseWizard = () => {
   const [step, setStep] = useState(1);
@@ -92,14 +93,14 @@ const CreateCaseWizard = () => {
         required
       />
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-secondary-700 mb-1">
           Description
         </label>
         <textarea
           value={caseData.description}
           onChange={(e) => handleInputChange('description', e.target.value)}
           placeholder="Describe the mediation case"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           rows={4}
           required
         />
@@ -257,25 +258,28 @@ const CreateCaseWizard = () => {
   return (
     <div className="max-w-2xl mx-auto">
       <Card>
-        <h1 className="text-2xl font-bold mb-6">Create New Mediation Case</h1>
-        <div className="mb-6">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-secondary-900 mb-2">Let's Create Your Mediation Case</h1>
+          <p className="text-secondary-600">We'll guide you through the process step by step</p>
+        </div>
+        <div className="mb-8">
           <div className="flex items-center space-x-4">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= 1 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
-              1
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${step >= 1 ? 'bg-primary-500 text-white' : 'bg-secondary-200 text-secondary-600'}`}>
+              <FileText className="h-5 w-5" />
             </div>
-            <div className={`flex-1 h-1 ${step >= 2 ? 'bg-blue-500' : 'bg-gray-200'}`}></div>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= 2 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
-              2
+            <div className={`flex-1 h-1 ${step >= 2 ? 'bg-primary-500' : 'bg-secondary-200'}`}></div>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${step >= 2 ? 'bg-primary-500 text-white' : 'bg-secondary-200 text-secondary-600'}`}>
+              <Users className="h-5 w-5" />
             </div>
-            <div className={`flex-1 h-1 ${step >= 3 ? 'bg-blue-500' : 'bg-gray-200'}`}></div>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= 3 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
-              3
+            <div className={`flex-1 h-1 ${step >= 3 ? 'bg-primary-500' : 'bg-secondary-200'}`}></div>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${step >= 3 ? 'bg-primary-500 text-white' : 'bg-secondary-200 text-secondary-600'}`}>
+              <Settings className="h-5 w-5" />
             </div>
           </div>
-          <div className="flex justify-between mt-2 text-sm text-gray-600">
+          <div className="flex justify-between mt-2 text-sm text-secondary-600">
             <span>Case Details</span>
-            <span>Invite</span>
-            <span>Context</span>
+            <span>Invite Others</span>
+            <span>Add Context</span>
           </div>
         </div>
         {step === 1 && renderStep1()}
