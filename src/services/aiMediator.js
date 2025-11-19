@@ -4,9 +4,10 @@ import OpenAI from 'openai';
 const OPENAI_MODEL = 'gpt-4';
 
 // Initialize OpenAI client with API key from environment variables
-// Note: Removed dangerouslyAllowBrowser for security - requires server-side proxy in production
+// Conditionally enable dangerouslyAllowBrowser based on VITE_OPENAI_ALLOW_BROWSER env var for secure deployment
 const openai = new OpenAI({
   apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+  dangerouslyAllowBrowser: import.meta.env.VITE_OPENAI_ALLOW_BROWSER === 'true',
 });
 
 // System prompt that defines the AI mediator's role and behavior
