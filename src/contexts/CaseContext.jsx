@@ -155,6 +155,51 @@ export const CaseProvider = ({ children }) => {
     }
   };
 
+  const uploadFile = async (caseId, file) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    // Upload file to Supabase storage
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `case-files/${caseId}/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('case-files')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    // Insert file record in database
+    const { data: fileRecord, error: dbError } = await supabase
+      .from('case_files')
+      .insert({
+        case_id: caseId,
+        user_id: user.id,
+        file_name: file.name,
+        file_path: filePath,
+        file_size: file.size,
+        mime_type: file.type,
+      })
+      .select()
+      .single();
+
+    if (dbError) throw dbError;
+
+    return fileRecord;
+  };
+
+  const getCaseFiles = async (caseId) => {
+    const { data, error } = await supabase
+      .from('case_files')
+      .select('*')
+      .eq('case_id', caseId)
+      .order('uploaded_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  };
+
   const updateCase = (caseId, updates) => {
     setCases(prev => prev.map(c => c.id === caseId ? { ...c, ...updates } : c));
     if (currentCase?.id === caseId) {
@@ -174,6 +219,8 @@ export const CaseProvider = ({ children }) => {
     joinCaseWithToken,
     updateCase,
     fetchCases,
+    uploadFile,
+    getCaseFiles,
   };
 
   return (
