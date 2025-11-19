@@ -10,6 +10,8 @@ const Dashboard = () => {
   const { cases, loading, error, fetchCases } = useCase();
   const [timeoutError, setTimeoutError] = useState(false);
 
+  console.log('Dashboard render - cases:', cases, 'loading:', loading, 'error:', error, 'timeoutError:', timeoutError);
+
   useEffect(() => {
     if (loading) {
       const timer = setTimeout(() => {

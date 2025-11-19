@@ -57,6 +57,7 @@ export const AuthProvider = ({ children }) => {
     // Listen for auth state changes (login, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        console.log('Auth state change:', _event, 'user:', session?.user?.id);
         setUser(session?.user ?? null);
         if (session?.user) {
           await ensureProfileExists(session.user);

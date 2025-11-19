@@ -19,8 +19,14 @@ export const CaseProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const fetchCases = async () => {
-    if (!user) return;
+    console.log('fetchCases called, user:', user);
+    if (!user) {
+      console.log('No user, returning early');
+      setLoading(false);
+      return;
+    }
     try {
+      console.log('Fetching cases from database');
       const { data, error } = await supabase
         .from('cases')
         .select('*')
@@ -29,6 +35,7 @@ export const CaseProvider = ({ children }) => {
       if (error) {
         console.error('Error fetching cases:', error?.message || JSON.stringify(error));
       } else {
+        console.log('Fetched cases:', data);
         setCases(data || []);
       }
     } catch (err) {
