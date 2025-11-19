@@ -46,10 +46,10 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-neutral-50 via-primary-50 to-primary-100 px-4 sm:px-6 lg:px-8 animate-fade-in">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-black px-4 sm:px-6 lg:px-8 animate-fade-in">
       <div className="w-full max-w-md space-y-8 animate-scale-in">
         {/* Auth Form */}
-        <Card className="shadow-2xl border border-gray-700 bg-gray-900 backdrop-blur-lg text-white" hover>
+        <Card className="shadow-2xl border border-gray-600 bg-black/50 backdrop-blur-lg text-white" hover>
           <div className="text-center mb-8 animate-slide-up">
             <img
               src="/mediatorai.png"
@@ -60,7 +60,7 @@ const Auth = () => {
               <Scale className="h-10 w-10" />
               Welcome to MediatorAI
             </h1>
-            <p className="text-gray-300 mt-2">Peaceful dispute resolution powered by AI</p>
+            <p className="text-white mt-2">Peaceful dispute resolution powered by AI</p>
           </div>
           <div className="flex mb-8 bg-gray-800 rounded-xl p-1">
             <button
@@ -69,7 +69,7 @@ const Auth = () => {
               className={`flex-1 py-3 px-4 text-center font-semibold rounded-lg transition-all duration-200 ${
                 isLogin
                   ? 'bg-gray-700 text-white shadow-sm'
-                  : 'text-gray-400 hover:text-white'
+                  : 'text-white hover:text-white'
               }`}
             >
               Sign In
@@ -80,7 +80,7 @@ const Auth = () => {
               className={`flex-1 py-3 px-4 text-center font-semibold rounded-lg transition-all duration-200 ${
                 !isLogin
                   ? 'bg-gray-700 text-white shadow-sm'
-                  : 'text-gray-400 hover:text-white'
+                  : 'text-white hover:text-white'
               }`}
             >
               Sign Up
@@ -96,7 +96,7 @@ const Auth = () => {
                 <span className="w-full border-t border-gray-600" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-gray-900 text-gray-400">Or continue with email</span>
+                <span className="px-2 bg-black/50 text-white">Or continue with email</span>
               </div>
             </div>
           </div>

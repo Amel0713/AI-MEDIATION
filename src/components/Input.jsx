@@ -12,23 +12,23 @@ const Input = ({
   icon,
   ...props
 }) => {
-  const inputClasses = `w-full px-4 py-3 border-2 rounded-xl bg-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-neutral-50 ${
+  const inputClasses = `w-full px-4 py-3 border-2 rounded-xl bg-gray-800 text-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-700 ${
     error
       ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-      : 'border-neutral-300 hover:border-neutral-400'
+      : 'border-gray-600 hover:border-gray-500'
   } ${icon ? 'pl-12' : ''} ${className}`;
 
   return (
     <div className="mb-5">
       {label && (
-        <label className="block text-sm font-semibold text-neutral-700 mb-2">
+        <label className="block text-sm font-semibold text-white mb-2">
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
       <div className="relative">
         {icon && (
-          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400">
+          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
             {icon}
           </div>
         )}
