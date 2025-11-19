@@ -77,7 +77,7 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {loading && (
+      {loading && !timeoutError && (
         <div className="text-center animate-fade-in">
           <p className="text-xl text-neutral-600">Loading your cases...</p>
         </div>

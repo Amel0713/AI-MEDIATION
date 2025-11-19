@@ -26,21 +26,29 @@ export const CaseProvider = ({ children }) => {
       return;
     }
     try {
-      console.log('Fetching cases from database');
+      console.log('About to execute supabase query for cases');
+      const startTime = Date.now();
+      const abortController = new AbortController();
+      const timeoutId = setTimeout(() => abortController.abort(), 10000);
       const { data, error } = await supabase
         .from('cases')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .abortSignal(abortController.signal);
+      clearTimeout(timeoutId);
+      const endTime = Date.now();
+      console.log('Supabase query completed in', endTime - startTime, 'ms');
 
       if (error) {
         console.error('Error fetching cases:', error?.message || JSON.stringify(error));
       } else {
-        console.log('Fetched cases:', data);
+        console.log('Fetched cases successfully, count:', data?.length || 0, 'data:', data);
         setCases(data || []);
       }
     } catch (err) {
-      console.error('Error fetching cases:', err?.message || JSON.stringify(err));
+      console.error('Exception in fetchCases:', err?.message || JSON.stringify(err));
     }
+    console.log('Setting loading to false');
     setLoading(false);
   };
 
