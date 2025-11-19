@@ -45,81 +45,99 @@ const Auth = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-lg space-y-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-neutral-50 via-primary-50 to-primary-100 px-4 sm:px-6 lg:px-8 animate-fade-in">
+      <div className="w-full max-w-md space-y-8 animate-scale-in">
         {/* Auth Form */}
-        <Card className="shadow-2xl border border-gray-200 rounded-xl bg-white/90 backdrop-blur-sm">
-          <div className="text-center mb-6">
-            <img src="/mediatorai.png" alt="MediatorAI Logo" className="mx-auto h-16 w-auto" />
+        <Card className="shadow-2xl border border-neutral-200/50 bg-white/95 backdrop-blur-lg" hover>
+          <div className="text-center mb-8 animate-slide-up">
+            <img
+              src="/mediatorai.png"
+              alt="MediatorAI Logo"
+              className="mx-auto h-20 w-auto mb-4 transition-transform duration-300 hover:scale-105"
+            />
+            <h1 className="text-2xl font-bold text-neutral-900">Welcome to MediatorAI</h1>
+            <p className="text-neutral-600 mt-2">Peaceful dispute resolution powered by AI</p>
           </div>
-          <div className="flex mb-6 border-b border-gray-200">
+          <div className="flex mb-8 bg-neutral-100 rounded-xl p-1">
             <button
               type="button"
               onClick={() => setIsLogin(true)}
-              className={`flex-1 py-2 px-4 text-center font-medium ${isLogin ? 'border-b-2 border-primary-600 text-primary-600' : 'text-gray-500'}`}
+              className={`flex-1 py-3 px-4 text-center font-semibold rounded-lg transition-all duration-200 ${
+                isLogin
+                  ? 'bg-white text-primary-700 shadow-sm'
+                  : 'text-neutral-600 hover:text-neutral-900'
+              }`}
             >
               Sign In
             </button>
             <button
               type="button"
               onClick={() => setIsLogin(false)}
-              className={`flex-1 py-2 px-4 text-center font-medium ${!isLogin ? 'border-b-2 border-primary-600 text-primary-600' : 'text-gray-500'}`}
+              className={`flex-1 py-3 px-4 text-center font-semibold rounded-lg transition-all duration-200 ${
+                !isLogin
+                  ? 'bg-white text-primary-700 shadow-sm'
+                  : 'text-neutral-600 hover:text-neutral-900'
+              }`}
             >
               Sign Up
             </button>
           </div>
-          <Button onClick={handleGoogleSignIn} variant="outline" className="w-full mb-6 flex items-center justify-center gap-2">
+          <Button
+            onClick={handleGoogleSignIn}
+            variant="outline"
+            className="w-full mb-6 flex items-center justify-center gap-3"
+            lift
+          >
             <Chrome className="h-5 w-5" />
             Continue with Google
           </Button>
-          <div className="relative mb-6">
+          <div className="relative mb-8">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-secondary-300" />
+              <div className="w-full border-t border-neutral-300" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-secondary-500">Or continue with email</span>
+              <span className="px-4 bg-white text-neutral-500 font-medium">Or continue with email</span>
             </div>
           </div>
           <form onSubmit={handleSubmit} className="space-y-6">
             {!isLogin && (
-              <div className="relative">
-                <Input
-                  label="Full Name"
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                  className="pl-10"
-                />
-                <UserPlus className="absolute left-3 top-9 h-5 w-5 text-secondary-400" />
-              </div>
+              <Input
+                label="Full Name"
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+                icon={<UserPlus className="h-5 w-5" />}
+                className="animate-slide-up"
+              />
             )}
-            <div className="relative">
-              <Input
-                label="Email address"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-                className="pl-10"
-              />
-              <Mail className="absolute left-3 top-9 h-5 w-5 text-secondary-400" />
-            </div>
-            <div className="relative">
-              <Input
-                label="Password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-                className="pl-10"
-              />
-              <Lock className="absolute left-3 top-9 h-5 w-5 text-secondary-400" />
-            </div>
-            {error && <p className="text-red-600 text-sm">{error}</p>}
-            <Button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2">
+            <Input
+              label="Email address"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+              icon={<Mail className="h-5 w-5" />}
+              className="animate-slide-up"
+            />
+            <Input
+              label="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="current-password"
+              icon={<Lock className="h-5 w-5" />}
+              error={error}
+              className="animate-slide-up"
+            />
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 mt-8"
+              lift
+            >
               {isLogin ? <LogIn className="h-5 w-5" /> : <UserPlus className="h-5 w-5" />}
               {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
             </Button>
