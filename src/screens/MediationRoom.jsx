@@ -2,72 +2,69 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCase } from '../contexts/CaseContext';
 import { useAuth } from '../contexts/AuthContext';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../services/supabase';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import { summarizeSituation, suggestCompromises, rephraseMessage, generateAgreementDraft, improveAgreementClarity } from '../services/aiMediator';
 
-const supabaseUrl = 'https://xewnexcvcafepzzeumwa.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhld25leGN2Y2FmZXB6emV1bXdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTU1MTksImV4cCI6MjA3OTA3MTkxOX0.opSMjAk99ZKFhWtCly8gAXzXn-TjJtW8-a2tHFpkTOs';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
+// Main mediation room component for real-time chat and AI-assisted mediation
 const MediationRoom = () => {
-  const { caseId } = useParams();
+  const { caseId } = useParams(); // Get case ID from URL
   const navigate = useNavigate();
-  const { currentCase } = useCase();
-  const { user } = useAuth();
-  const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([]);
-  const [participants, setParticipants] = useState([]);
-  const [contexts, setContexts] = useState([]);
-  const [agreement, setAgreement] = useState(null);
-  const [draftText, setDraftText] = useState('');
-  const [activeTab, setActiveTab] = useState('context');
-  const [loading, setLoading] = useState(true);
+  const { currentCase } = useCase(); // Current case data from context
+  const { user } = useAuth(); // Current authenticated user
+  const [message, setMessage] = useState(''); // Current message being typed
+  const [messages, setMessages] = useState([]); // Chat messages
+  const [participants, setParticipants] = useState([]); // Case participants
+  const [contexts, setContexts] = useState([]); // Party contexts/backgrounds
+  const [agreement, setAgreement] = useState(null); // Current agreement draft
+  const [draftText, setDraftText] = useState(''); // Editable agreement text
+  const [activeTab, setActiveTab] = useState('context'); // Active sidebar tab
+  const [loading, setLoading] = useState(true); // Loading state
+  const [signingParticipant, setSigningParticipant] = useState(null); // Participant being signed
+  const [signingName, setSigningName] = useState(''); // Name entered for signing
 
+  // Fetch all case-related data from Supabase
   const fetchData = async () => {
     if (!caseId) return;
 
     try {
-      // Fetch messages
-      const { data: messagesData, error: messagesError } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('case_id', caseId)
-        .order('created_at', { ascending: true });
+      // Parallel fetch for better performance
+      const [messagesResult, participantsResult, contextsResult, agreementResult] = await Promise.all([
+        supabase
+          .from('messages')
+          .select('*')
+          .eq('case_id', caseId)
+          .order('created_at', { ascending: true }),
+        supabase
+          .from('case_participants')
+          .select('*, profiles(*)')
+          .eq('case_id', caseId),
+        supabase
+          .from('case_context')
+          .select('*')
+          .eq('case_id', caseId),
+        supabase
+          .from('agreements')
+          .select('*')
+          .eq('case_id', caseId)
+          .single()
+      ]);
 
-      if (messagesError) throw messagesError;
-      setMessages(messagesData || []);
+      if (messagesResult.error) throw messagesResult.error;
+      setMessages(messagesResult.data || []);
 
-      // Fetch participants
-      const { data: participantsData, error: participantsError } = await supabase
-        .from('case_participants')
-        .select('*, profiles(*)')
-        .eq('case_id', caseId);
+      if (participantsResult.error) throw participantsResult.error;
+      setParticipants(participantsResult.data || []);
 
-      if (participantsError) throw participantsError;
-      setParticipants(participantsData || []);
+      if (contextsResult.error) throw contextsResult.error;
+      setContexts(contextsResult.data || []);
 
-      // Fetch contexts
-      const { data: contextsData, error: contextsError } = await supabase
-        .from('case_context')
-        .select('*')
-        .eq('case_id', caseId);
-
-      if (contextsError) throw contextsError;
-      setContexts(contextsData || []);
-
-      // Fetch agreement
-      const { data: agreementData, error: agreementError } = await supabase
-        .from('agreements')
-        .select('*')
-        .eq('case_id', caseId)
-        .single();
-
-      if (agreementError && agreementError.code !== 'PGRST116') throw agreementError;
-      setAgreement(agreementData);
-      setDraftText(agreementData?.draft_text || '');
+      // PGRST116 = no rows found, which is OK for new cases
+      if (agreementResult.error && agreementResult.error.code !== 'PGRST116') throw agreementResult.error;
+      setAgreement(agreementResult.data);
+      setDraftText(agreementResult.data?.draft_text || '');
 
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -76,7 +73,9 @@ const MediationRoom = () => {
     }
   };
 
+  // Initialize component and set up real-time subscriptions
   useEffect(() => {
+    // Redirect if case doesn't exist or ID mismatch
     if (!currentCase || currentCase.id !== caseId) {
       navigate('/dashboard');
       return;
@@ -84,7 +83,7 @@ const MediationRoom = () => {
 
     fetchData();
 
-    // Set up realtime subscription
+    // Real-time subscription for new messages
     const messagesChannel = supabase
       .channel('messages')
       .on('postgres_changes', {
@@ -97,6 +96,7 @@ const MediationRoom = () => {
       })
       .subscribe();
 
+    // Real-time subscription for agreement changes
     const agreementsChannel = supabase
       .channel('agreements')
       .on('postgres_changes', {
@@ -109,6 +109,7 @@ const MediationRoom = () => {
       })
       .subscribe();
 
+    // Real-time subscription for participant updates (e.g., signing status)
     const participantsChannel = supabase
       .channel('case_participants')
       .on('postgres_changes', {
@@ -121,6 +122,7 @@ const MediationRoom = () => {
       })
       .subscribe();
 
+    // Cleanup subscriptions on unmount
     return () => {
       supabase.removeChannel(messagesChannel);
       supabase.removeChannel(agreementsChannel);
@@ -178,7 +180,6 @@ const MediationRoom = () => {
       content: `AI Summary: ${summary}`,
       message_type: 'ai_suggestion',
     });
-    fetchData();
   };
 
   const handleSuggestCompromises = async () => {
@@ -200,7 +201,6 @@ const MediationRoom = () => {
       content: `AI Suggested Compromises: ${suggestions}`,
       message_type: 'ai_suggestion',
     });
-    fetchData();
   };
 
   const handleRephrase = async () => {
@@ -214,7 +214,6 @@ const MediationRoom = () => {
       content: `Rephrased calmly: ${rephrased}`,
       message_type: 'ai_suggestion',
     });
-    fetchData();
   };
 
   const handleGenerateDraft = async () => {
@@ -245,7 +244,6 @@ const MediationRoom = () => {
       content: `AI Draft Agreement: ${draft}`,
       message_type: 'ai_suggestion',
     });
-    fetchData();
   };
 
   const handleImproveClarity = async () => {
@@ -258,16 +256,19 @@ const MediationRoom = () => {
     await supabase.from('agreements').update({ finalized_text: draftText, status: 'finalized', finalized_at: new Date().toISOString() }).eq('case_id', caseId);
   };
 
-  const handleSign = async (participantId, fullName) => {
-    const enteredName = prompt("Type your full name to acknowledge:");
-    if (enteredName === fullName) {
-      await supabase.from('case_participants').update({ has_signed_agreement: true, signed_at: new Date().toISOString() }).eq('id', participantId);
+  const handleSign = async () => {
+    const participant = participants.find(p => p.id === signingParticipant);
+    const fullName = participant?.profiles?.full_name || participant?.profiles?.email || '';
+    if (signingName === fullName) {
+      await supabase.from('case_participants').update({ has_signed_agreement: true, signed_at: new Date().toISOString() }).eq('id', signingParticipant);
       // Check if all signed
       const { data: updatedParticipants } = await supabase.from('case_participants').select('has_signed_agreement').eq('case_id', caseId);
       const allSigned = updatedParticipants.every(p => p.has_signed_agreement);
       if (allSigned) {
         await supabase.from('cases').update({ status: 'resolved' }).eq('id', caseId);
       }
+      setSigningParticipant(null);
+      setSigningName('');
     } else {
       alert("Name does not match. Please try again.");
     }
@@ -411,12 +412,27 @@ const MediationRoom = () => {
                           {p.has_signed_agreement ? (
                             <span className="text-green-600">Signed at {new Date(p.signed_at).toLocaleString()}</span>
                           ) : (
-                            <Button onClick={() => handleSign(p.id, displayName)} size="sm">Sign / Acknowledge</Button>
+                            <Button onClick={() => setSigningParticipant(p.id)} size="sm">Sign / Acknowledge</Button>
                           )}
                         </div>
                       );
                     })}
                   </div>
+                  {signingParticipant && (
+                    <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                      <p className="text-sm mb-2">Please enter your full name to confirm signing:</p>
+                      <div className="flex space-x-2">
+                        <Input
+                          value={signingName}
+                          onChange={(e) => setSigningName(e.target.value)}
+                          placeholder="Full name"
+                          className="flex-1"
+                        />
+                        <Button onClick={handleSign} size="sm">Confirm</Button>
+                        <Button onClick={() => { setSigningParticipant(null); setSigningName(''); }} variant="outline" size="sm">Cancel</Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

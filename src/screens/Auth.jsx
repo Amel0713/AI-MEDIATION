@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
-import { LogIn, UserPlus, Mail, Lock, Chrome } from 'lucide-react';
+import { LogIn, UserPlus, Mail, Lock } from 'lucide-react';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -13,7 +13,7 @@ const Auth = () => {
   const [fullName, setFullName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp, signInWithGoogle } = useAuth();
+  const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -35,14 +35,6 @@ const Auth = () => {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    try {
-      await signInWithGoogle();
-      // OAuth will redirect, so no need to navigate here
-    } catch (err) {
-      setError(err.message);
-    }
-  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-neutral-50 via-primary-50 to-primary-100 px-4 sm:px-6 lg:px-8 animate-fade-in">
@@ -81,23 +73,6 @@ const Auth = () => {
             >
               Sign Up
             </button>
-          </div>
-          <Button
-            onClick={handleGoogleSignIn}
-            variant="outline"
-            className="w-full mb-6 flex items-center justify-center gap-3"
-            lift
-          >
-            <Chrome className="h-5 w-5" />
-            Continue with Google
-          </Button>
-          <div className="relative mb-8">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-neutral-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-neutral-500 font-medium">Or continue with email</span>
-            </div>
           </div>
           <form onSubmit={handleSubmit} className="space-y-6">
             {!isLogin && (
