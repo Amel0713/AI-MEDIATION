@@ -84,35 +84,36 @@ const CreateCaseWizard = () => {
   };
 
   const renderStep1 = () => (
-    <form onSubmit={handleStep1Submit} className="space-y-6">
+    <form onSubmit={handleStep1Submit} className="space-y-6 animate-fade-in">
       <Input
         label="Case Title"
         value={caseData.title}
         onChange={(e) => handleInputChange('title', e.target.value)}
         placeholder="Enter case title"
         required
+        className="animate-slide-up"
       />
-      <div>
-        <label className="block text-sm font-medium text-secondary-700 mb-1">
+      <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+        <label className="block text-sm font-semibold text-neutral-700 mb-2">
           Description
         </label>
         <textarea
           value={caseData.description}
           onChange={(e) => handleInputChange('description', e.target.value)}
           placeholder="Describe the mediation case"
-          className="w-full px-3 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-4 py-3 border-2 border-neutral-300 rounded-xl bg-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:bg-neutral-50 resize-none"
           rows={4}
           required
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+      <div className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
+        <label className="block text-sm font-semibold text-neutral-700 mb-2">
           Case Type
         </label>
         <select
           value={caseData.type}
           onChange={(e) => handleInputChange('type', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-3 border-2 border-neutral-300 rounded-xl bg-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:bg-neutral-50"
           required
         >
           <option value="personal">Personal</option>
@@ -120,11 +121,11 @@ const CreateCaseWizard = () => {
           <option value="agreement">Agreement</option>
         </select>
       </div>
-      <div className="flex space-x-4">
-        <Button type="submit" disabled={loading}>
+      <div className="flex space-x-4 pt-4 animate-slide-up" style={{ animationDelay: '0.3s' }}>
+        <Button type="submit" disabled={loading} lift>
           {loading ? 'Creating...' : 'Next'}
         </Button>
-        <Button type="button" variant="outline" onClick={() => navigate('/dashboard')}>
+        <Button type="button" variant="outline" onClick={() => navigate('/dashboard')} lift>
           Cancel
         </Button>
       </div>
@@ -132,19 +133,20 @@ const CreateCaseWizard = () => {
   );
 
   const renderStep2 = () => (
-    <form onSubmit={handleStep2Submit} className="space-y-6">
+    <form onSubmit={handleStep2Submit} className="space-y-6 animate-fade-in">
       <Input
         label="Invite Email (optional)"
         type="email"
         value={caseData.inviteEmail}
         onChange={(e) => handleInputChange('inviteEmail', e.target.value)}
         placeholder="invited@example.com"
+        className="animate-slide-up"
       />
-      <div className="flex space-x-4">
-        <Button type="submit" disabled={loading}>
+      <div className="flex space-x-4 pt-4 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+        <Button type="submit" disabled={loading} lift>
           {loading ? 'Generating...' : 'Generate Invite Link'}
         </Button>
-        <Button type="button" variant="outline" onClick={() => setStep(1)}>
+        <Button type="button" variant="outline" onClick={() => setStep(1)} lift>
           Back
         </Button>
       </div>
@@ -152,66 +154,66 @@ const CreateCaseWizard = () => {
   );
 
   const renderStep3 = () => (
-    <form onSubmit={handleStep3Submit} className="space-y-6">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+    <form onSubmit={handleStep3Submit} className="space-y-6 animate-fade-in">
+      <div className="animate-slide-up">
+        <label className="block text-sm font-semibold text-neutral-700 mb-2">
           Background
         </label>
         <textarea
           value={caseData.backgroundText}
           onChange={(e) => handleInputChange('backgroundText', e.target.value)}
           placeholder="Provide background information"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-3 border-2 border-neutral-300 rounded-xl bg-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:bg-neutral-50 resize-none"
           rows={3}
           required
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+      <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+        <label className="block text-sm font-semibold text-neutral-700 mb-2">
           Goals
         </label>
         <textarea
           value={caseData.goalsText}
           onChange={(e) => handleInputChange('goalsText', e.target.value)}
           placeholder="What are your goals?"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-3 border-2 border-neutral-300 rounded-xl bg-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:bg-neutral-50 resize-none"
           rows={3}
           required
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+      <div className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
+        <label className="block text-sm font-semibold text-neutral-700 mb-2">
           Acceptable Outcome
         </label>
         <textarea
           value={caseData.acceptableOutcomeText}
           onChange={(e) => handleInputChange('acceptableOutcomeText', e.target.value)}
           placeholder="What outcome would be acceptable?"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-3 border-2 border-neutral-300 rounded-xl bg-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:bg-neutral-50 resize-none"
           rows={3}
           required
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+      <div className="animate-slide-up" style={{ animationDelay: '0.3s' }}>
+        <label className="block text-sm font-semibold text-neutral-700 mb-2">
           Constraints
         </label>
         <textarea
           value={caseData.constraintsText}
           onChange={(e) => handleInputChange('constraintsText', e.target.value)}
           placeholder="Any constraints or limitations?"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-3 border-2 border-neutral-300 rounded-xl bg-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:bg-neutral-50 resize-none"
           rows={3}
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+      <div className="animate-slide-up" style={{ animationDelay: '0.4s' }}>
+        <label className="block text-sm font-semibold text-neutral-700 mb-2">
           Sensitivity Level
         </label>
         <select
           value={caseData.sensitivityLevel}
           onChange={(e) => handleInputChange('sensitivityLevel', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-3 border-2 border-neutral-300 rounded-xl bg-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:bg-neutral-50"
           required
         >
           <option value="low">Low</option>
@@ -219,11 +221,11 @@ const CreateCaseWizard = () => {
           <option value="high">High</option>
         </select>
       </div>
-      <div className="flex space-x-4">
-        <Button type="submit" disabled={loading}>
+      <div className="flex space-x-4 pt-4 animate-slide-up" style={{ animationDelay: '0.5s' }}>
+        <Button type="submit" disabled={loading} lift>
           {loading ? 'Finalizing...' : 'Create Case'}
         </Button>
-        <Button type="button" variant="outline" onClick={() => setStep(2)}>
+        <Button type="button" variant="outline" onClick={() => setStep(2)} lift>
           Back
         </Button>
       </div>
@@ -234,20 +236,22 @@ const CreateCaseWizard = () => {
     if (!caseData.inviteToken) return null;
     const inviteUrl = `${window.location.origin}/join/${caseData.inviteToken}`;
     return (
-      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-        <p className="text-sm font-medium text-gray-700 mb-2">Invite Link:</p>
-        <div className="flex items-center space-x-2">
+      <div className="mt-6 p-6 bg-neutral-50 rounded-xl border border-neutral-200 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+        <p className="text-sm font-semibold text-neutral-700 mb-3">Invite Link Generated:</p>
+        <div className="flex items-center space-x-3">
           <input
             type="text"
             value={inviteUrl}
             readOnly
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-white"
+            className="flex-1 px-4 py-3 border-2 border-neutral-300 rounded-xl bg-white shadow-sm font-mono text-sm"
           />
           <Button
             type="button"
             onClick={() => navigator.clipboard.writeText(inviteUrl)}
             variant="outline"
+            lift
           >
+            <Copy className="h-4 w-4 mr-2" />
             Copy
           </Button>
         </div>
@@ -256,30 +260,32 @@ const CreateCaseWizard = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <Card>
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-secondary-900 mb-2">Let's Create Your Mediation Case</h1>
-          <p className="text-secondary-600">We'll guide you through the process step by step</p>
+    <div className="max-w-2xl mx-auto animate-fade-in">
+      <Card hover>
+        <div className="text-center mb-8 animate-slide-up">
+          <h1 className="text-4xl font-bold text-neutral-900 mb-4 bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
+            Let's Create Your Mediation Case
+          </h1>
+          <p className="text-neutral-600 text-lg">We'll guide you through the process step by step</p>
         </div>
-        <div className="mb-8">
-          <div className="flex items-center space-x-4">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${step >= 1 ? 'bg-primary-500 text-white' : 'bg-secondary-200 text-secondary-600'}`}>
-              <FileText className="h-5 w-5" />
+        <div className="mb-12 animate-scale-in" style={{ animationDelay: '0.2s' }}>
+          <div className="flex items-center space-x-6">
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${step >= 1 ? 'bg-primary-500 text-white shadow-lg' : 'bg-neutral-200 text-neutral-600'}`}>
+              <FileText className="h-6 w-6" />
             </div>
-            <div className={`flex-1 h-1 ${step >= 2 ? 'bg-primary-500' : 'bg-secondary-200'}`}></div>
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${step >= 2 ? 'bg-primary-500 text-white' : 'bg-secondary-200 text-secondary-600'}`}>
-              <Users className="h-5 w-5" />
+            <div className={`flex-1 h-2 rounded-full transition-all duration-300 ${step >= 2 ? 'bg-primary-500' : 'bg-neutral-200'}`}></div>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${step >= 2 ? 'bg-primary-500 text-white shadow-lg' : 'bg-neutral-200 text-neutral-600'}`}>
+              <Users className="h-6 w-6" />
             </div>
-            <div className={`flex-1 h-1 ${step >= 3 ? 'bg-primary-500' : 'bg-secondary-200'}`}></div>
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${step >= 3 ? 'bg-primary-500 text-white' : 'bg-secondary-200 text-secondary-600'}`}>
-              <Settings className="h-5 w-5" />
+            <div className={`flex-1 h-2 rounded-full transition-all duration-300 ${step >= 3 ? 'bg-primary-500' : 'bg-neutral-200'}`}></div>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${step >= 3 ? 'bg-primary-500 text-white shadow-lg' : 'bg-neutral-200 text-neutral-600'}`}>
+              <Settings className="h-6 w-6" />
             </div>
           </div>
-          <div className="flex justify-between mt-2 text-sm text-secondary-600">
-            <span>Case Details</span>
-            <span>Invite Others</span>
-            <span>Add Context</span>
+          <div className="flex justify-between mt-4 text-sm font-medium text-neutral-600">
+            <span className={step >= 1 ? 'text-primary-600' : ''}>Case Details</span>
+            <span className={step >= 2 ? 'text-primary-600' : ''}>Invite Others</span>
+            <span className={step >= 3 ? 'text-primary-600' : ''}>Add Context</span>
           </div>
         </div>
         {step === 1 && renderStep1()}
