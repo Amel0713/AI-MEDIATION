@@ -45,21 +45,29 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-lg space-y-8">
+        {/* Hero Section */}
         <div className="text-center">
-          <img src="/mediatorai.png" alt="MediatorAI Logo" className="mx-auto h-24 w-auto mb-6" />
-          <div className="flex justify-center mb-4">
-            {isLogin ? <LogIn className="h-10 w-10 text-indigo-600" /> : <UserPlus className="h-10 w-10 text-indigo-600" />}
+          <img src="/mediatorai.png" alt="MediatorAI Logo" className="mx-auto h-32 w-auto mb-8 drop-shadow-lg" />
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4">
+            MediatorAI
+          </h1>
+          <p className="text-lg text-gray-700 mb-6 max-w-md mx-auto">
+            Empowering fair and efficient dispute resolution through AI-driven mediation.
+          </p>
+          <div className="flex justify-center mb-6">
+            {isLogin ? <LogIn className="h-12 w-12 text-primary-600" /> : <UserPlus className="h-12 w-12 text-primary-600" />}
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
             {isLogin ? 'Welcome back!' : 'Join us today!'}
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-base">
             {isLogin ? 'Sign in to continue your mediation journey' : 'Create your account to get started'}
           </p>
         </div>
-        <Card className="shadow-2xl border border-gray-200 rounded-xl">
+        {/* Auth Form */}
+        <Card className="shadow-2xl border border-gray-200 rounded-xl bg-white/90 backdrop-blur-sm">
           <Button onClick={handleGoogleSignIn} variant="outline" className="w-full mb-6 flex items-center justify-center gap-2">
             <Chrome className="h-5 w-5" />
             Continue with Google
