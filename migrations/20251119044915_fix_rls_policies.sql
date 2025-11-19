@@ -42,3 +42,7 @@ CREATE POLICY "Users can view profiles of case participants" ON profiles
             WHERE cp1.user_id = auth.uid() AND cp2.user_id = profiles.id
         )
     );
+
+-- Add INSERT policy for profiles to allow users to create their own profile during sign up
+DROP POLICY IF EXISTS "Users can insert their own profile" ON profiles;
+CREATE POLICY "Users can insert their own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
