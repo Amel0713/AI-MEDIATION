@@ -34,6 +34,7 @@ export const AuthProvider = ({ children }) => {
         .insert({
           id: user.id,
           email: user.email,
+          full_name: user.user_metadata?.full_name || null,
         });
       if (insertError) console.error('Error creating profile:', insertError);
     }
@@ -83,19 +84,18 @@ export const AuthProvider = ({ children }) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-    });
-    if (error) throw error;
-
-    // Create user profile with additional information
-    if (data.user) {
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          id: data.user.id,
-          email: data.user.email,
+      options: {
+        data: {
           full_name: fullName,
-        });
-      if (profileError) throw profileError;
+        },
+      },
+    });
+    if (error) {
+      if (error.status === 429) {
+        throw new Error('Too many sign-up attempts. Please wait a few minutes before trying again.');
+      } else {
+        throw error;
+      }
     }
 
     return data;
