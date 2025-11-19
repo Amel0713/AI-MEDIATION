@@ -1,14 +1,14 @@
 -- Create custom types
-CREATE TYPE case_type AS ENUM ('personal', 'workplace', 'agreement');
-CREATE TYPE case_status AS ENUM ('draft', 'active', 'resolved', 'cancelled');
-CREATE TYPE sender_type AS ENUM ('user', 'ai', 'system');
-CREATE TYPE message_type AS ENUM ('plain', 'ai_suggestion', 'system');
-CREATE TYPE agreement_status AS ENUM ('none', 'draft', 'finalized');
-CREATE TYPE sensitivity_level AS ENUM ('low', 'normal', 'high');
-CREATE TYPE role_in_case AS ENUM ('initiator', 'invited_party');
+CREATE TYPE IF NOT EXISTS case_type AS ENUM ('personal', 'workplace', 'agreement');
+CREATE TYPE IF NOT EXISTS case_status AS ENUM ('draft', 'active', 'resolved', 'cancelled');
+CREATE TYPE IF NOT EXISTS sender_type AS ENUM ('user', 'ai', 'system');
+CREATE TYPE IF NOT EXISTS message_type AS ENUM ('plain', 'ai_suggestion', 'system');
+CREATE TYPE IF NOT EXISTS agreement_status AS ENUM ('none', 'draft', 'finalized');
+CREATE TYPE IF NOT EXISTS sensitivity_level AS ENUM ('low', 'normal', 'high');
+CREATE TYPE IF NOT EXISTS role_in_case AS ENUM ('initiator', 'invited_party');
 
 -- Create profiles table
-CREATE TABLE profiles (
+CREATE TABLE IF NOT EXISTS profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id),
     email TEXT,
     full_name TEXT,
@@ -16,7 +16,7 @@ CREATE TABLE profiles (
 );
 
 -- Create cases table
-CREATE TABLE cases (
+CREATE TABLE IF NOT EXISTS cases (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created_by UUID REFERENCES profiles(id),
     title TEXT,
@@ -30,7 +30,7 @@ CREATE TABLE cases (
 );
 
 -- Create case_participants table
-CREATE TABLE case_participants (
+CREATE TABLE IF NOT EXISTS case_participants (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     case_id UUID REFERENCES cases(id),
     user_id UUID REFERENCES profiles(id),
@@ -41,7 +41,7 @@ CREATE TABLE case_participants (
 );
 
 -- Create case_context table
-CREATE TABLE case_context (
+CREATE TABLE IF NOT EXISTS case_context (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     case_id UUID REFERENCES cases(id),
     user_id UUID REFERENCES profiles(id),
@@ -54,7 +54,7 @@ CREATE TABLE case_context (
 );
 
 -- Create messages table
-CREATE TABLE messages (
+CREATE TABLE IF NOT EXISTS messages (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     case_id UUID REFERENCES cases(id),
     sender_user_id UUID REFERENCES profiles(id),
@@ -65,7 +65,7 @@ CREATE TABLE messages (
 );
 
 -- Create agreements table
-CREATE TABLE agreements (
+CREATE TABLE IF NOT EXISTS agreements (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     case_id UUID REFERENCES cases(id),
     draft_text TEXT,
@@ -76,11 +76,11 @@ CREATE TABLE agreements (
 );
 
 -- Enable RLS on all tables
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE cases ENABLE ROW LEVEL SECURITY;
-ALTER TABLE case_context ENABLE ROW LEVEL SECURITY;
-ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
-ALTER TABLE agreements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS cases ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS case_context ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS agreements ENABLE ROW LEVEL SECURITY;
 
 -- Policies for profiles
 CREATE POLICY "Users can view their own profile" ON profiles
