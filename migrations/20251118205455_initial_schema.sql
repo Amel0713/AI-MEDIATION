@@ -131,92 +131,111 @@ ALTER TABLE IF EXISTS messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS agreements ENABLE ROW LEVEL SECURITY;
 
 -- Policies for profiles
+DROP POLICY IF EXISTS "Users can view their own profile" ON profiles;
 CREATE POLICY "Users can view their own profile" ON profiles
     FOR SELECT USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can update their own profile" ON profiles;
 CREATE POLICY "Users can update their own profile" ON profiles
     FOR UPDATE USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can insert their own profile" ON profiles;
 CREATE POLICY "Users can insert their own profile" ON profiles
     FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- Policies for cases
+DROP POLICY IF EXISTS "Users can view cases they created or participate in" ON cases;
 CREATE POLICY "Users can view cases they created or participate in" ON cases
     FOR SELECT USING (
         created_by = auth.uid() OR
         EXISTS (SELECT 1 FROM case_participants WHERE case_id = cases.id AND user_id = auth.uid())
     );
 
+DROP POLICY IF EXISTS "Users can insert cases they create" ON cases;
 CREATE POLICY "Users can insert cases they create" ON cases
     FOR INSERT WITH CHECK (created_by = auth.uid());
 
+DROP POLICY IF EXISTS "Users can update cases they created or participate in" ON cases;
 CREATE POLICY "Users can update cases they created or participate in" ON cases
     FOR UPDATE USING (
         created_by = auth.uid() OR
         EXISTS (SELECT 1 FROM case_participants WHERE case_id = cases.id AND user_id = auth.uid())
     );
 
+DROP POLICY IF EXISTS "Users can delete cases they created" ON cases;
 CREATE POLICY "Users can delete cases they created" ON cases
     FOR DELETE USING (created_by = auth.uid());
 
 -- Policies for case_context
+DROP POLICY IF EXISTS "Users can view context in cases they participate in" ON case_context;
 CREATE POLICY "Users can view context in cases they participate in" ON case_context
     FOR SELECT USING (
         EXISTS (SELECT 1 FROM case_participants WHERE case_id = case_context.case_id AND user_id = auth.uid())
     );
 
+DROP POLICY IF EXISTS "Users can insert context in cases they participate in" ON case_context;
 CREATE POLICY "Users can insert context in cases they participate in" ON case_context
     FOR INSERT WITH CHECK (
         EXISTS (SELECT 1 FROM case_participants WHERE case_id = case_context.case_id AND user_id = auth.uid())
     );
 
+DROP POLICY IF EXISTS "Users can update context in cases they participate in" ON case_context;
 CREATE POLICY "Users can update context in cases they participate in" ON case_context
     FOR UPDATE USING (
         EXISTS (SELECT 1 FROM case_participants WHERE case_id = case_context.case_id AND user_id = auth.uid())
     );
 
+DROP POLICY IF EXISTS "Users can delete context in cases they participate in" ON case_context;
 CREATE POLICY "Users can delete context in cases they participate in" ON case_context
     FOR DELETE USING (
         EXISTS (SELECT 1 FROM case_participants WHERE case_id = case_context.case_id AND user_id = auth.uid())
     );
 
 -- Policies for messages
+DROP POLICY IF EXISTS "Users can view messages in cases they participate in" ON messages;
 CREATE POLICY "Users can view messages in cases they participate in" ON messages
     FOR SELECT USING (
         EXISTS (SELECT 1 FROM case_participants WHERE case_id = messages.case_id AND user_id = auth.uid())
     );
 
+DROP POLICY IF EXISTS "Users can insert messages in cases they participate in" ON messages;
 CREATE POLICY "Users can insert messages in cases they participate in" ON messages
     FOR INSERT WITH CHECK (
         EXISTS (SELECT 1 FROM case_participants WHERE case_id = messages.case_id AND user_id = auth.uid())
     );
 
+DROP POLICY IF EXISTS "Users can update messages in cases they participate in" ON messages;
 CREATE POLICY "Users can update messages in cases they participate in" ON messages
     FOR UPDATE USING (
         EXISTS (SELECT 1 FROM case_participants WHERE case_id = messages.case_id AND user_id = auth.uid())
     );
 
+DROP POLICY IF EXISTS "Users can delete messages in cases they participate in" ON messages;
 CREATE POLICY "Users can delete messages in cases they participate in" ON messages
     FOR DELETE USING (
         EXISTS (SELECT 1 FROM case_participants WHERE case_id = messages.case_id AND user_id = auth.uid())
     );
 
 -- Policies for agreements
+DROP POLICY IF EXISTS "Users can view agreements in cases they participate in" ON agreements;
 CREATE POLICY "Users can view agreements in cases they participate in" ON agreements
     FOR SELECT USING (
         EXISTS (SELECT 1 FROM case_participants WHERE case_id = agreements.case_id AND user_id = auth.uid())
     );
 
+DROP POLICY IF EXISTS "Users can insert agreements in cases they participate in" ON agreements;
 CREATE POLICY "Users can insert agreements in cases they participate in" ON agreements
     FOR INSERT WITH CHECK (
         EXISTS (SELECT 1 FROM case_participants WHERE case_id = agreements.case_id AND user_id = auth.uid())
     );
 
+DROP POLICY IF EXISTS "Users can update agreements in cases they participate in" ON agreements;
 CREATE POLICY "Users can update agreements in cases they participate in" ON agreements
     FOR UPDATE USING (
         EXISTS (SELECT 1 FROM case_participants WHERE case_id = agreements.case_id AND user_id = auth.uid())
     );
 
+DROP POLICY IF EXISTS "Users can delete agreements in cases they participate in" ON agreements;
 CREATE POLICY "Users can delete agreements in cases they participate in" ON agreements
     FOR DELETE USING (
         EXISTS (SELECT 1 FROM case_participants WHERE case_id = agreements.case_id AND user_id = auth.uid())
