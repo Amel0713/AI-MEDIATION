@@ -55,7 +55,7 @@ export default {
           '100%': { opacity: '1' },
         },
         slideUp: {
-          '0%': { transform: 'translateY(10px)', opacity: '0' },
+          '0%': { transform: 'translateY(10px)', opacity: '1' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
         scaleIn: {
