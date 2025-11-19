@@ -49,24 +49,24 @@ const Auth = () => {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-neutral-50 via-primary-50 to-primary-100 px-4 sm:px-6 lg:px-8 animate-fade-in">
       <div className="w-full max-w-md space-y-8 animate-scale-in">
         {/* Auth Form */}
-        <Card className="shadow-2xl border border-neutral-200/50 bg-white/95 backdrop-blur-lg" hover>
+        <Card className="shadow-2xl border border-gray-700 bg-gray-900 backdrop-blur-lg text-white" hover>
           <div className="text-center mb-8 animate-slide-up">
             <img
               src="/mediatorai.png"
               alt="MediatorAI Logo"
               className="mx-auto h-20 w-auto mb-4 transition-transform duration-300 hover:scale-105"
             />
-            <h1 className="text-2xl font-bold text-neutral-900">Welcome to MediatorAI</h1>
-            <p className="text-neutral-600 mt-2">Peaceful dispute resolution powered by AI</p>
+            <h1 className="text-2xl font-bold text-white">Welcome to MediatorAI</h1>
+            <p className="text-gray-300 mt-2">Peaceful dispute resolution powered by AI</p>
           </div>
-          <div className="flex mb-8 bg-neutral-100 rounded-xl p-1">
+          <div className="flex mb-8 bg-gray-800 rounded-xl p-1">
             <button
               type="button"
               onClick={() => setIsLogin(true)}
               className={`flex-1 py-3 px-4 text-center font-semibold rounded-lg transition-all duration-200 ${
                 isLogin
-                  ? 'bg-white text-primary-700 shadow-sm'
-                  : 'text-neutral-600 hover:text-neutral-900'
+                  ? 'bg-gray-700 text-white shadow-sm'
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
               Sign In
@@ -76,8 +76,8 @@ const Auth = () => {
               onClick={() => setIsLogin(false)}
               className={`flex-1 py-3 px-4 text-center font-semibold rounded-lg transition-all duration-200 ${
                 !isLogin
-                  ? 'bg-white text-primary-700 shadow-sm'
-                  : 'text-neutral-600 hover:text-neutral-900'
+                  ? 'bg-gray-700 text-white shadow-sm'
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
               Sign Up
@@ -90,10 +90,10 @@ const Auth = () => {
             </Button>
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-neutral-300" />
+                <span className="w-full border-t border-gray-600" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-neutral-500">Or continue with email</span>
+                <span className="px-2 bg-gray-900 text-gray-400">Or continue with email</span>
               </div>
             </div>
           </div>
