@@ -1,11 +1,59 @@
 -- Create custom types
-CREATE TYPE IF NOT EXISTS case_type AS ENUM ('personal', 'workplace', 'agreement');
-CREATE TYPE IF NOT EXISTS case_status AS ENUM ('draft', 'active', 'resolved', 'cancelled');
-CREATE TYPE IF NOT EXISTS sender_type AS ENUM ('user', 'ai', 'system');
-CREATE TYPE IF NOT EXISTS message_type AS ENUM ('plain', 'ai_suggestion', 'system');
-CREATE TYPE IF NOT EXISTS agreement_status AS ENUM ('none', 'draft', 'finalized');
-CREATE TYPE IF NOT EXISTS sensitivity_level AS ENUM ('low', 'normal', 'high');
-CREATE TYPE IF NOT EXISTS role_in_case AS ENUM ('initiator', 'invited_party');
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'case_type') THEN
+        CREATE TYPE case_type AS ENUM ('personal', 'workplace', 'agreement');
+    END IF;
+END
+$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'case_status') THEN
+        CREATE TYPE case_status AS ENUM ('draft', 'active', 'resolved', 'cancelled');
+    END IF;
+END
+$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'sender_type') THEN
+        CREATE TYPE sender_type AS ENUM ('user', 'ai', 'system');
+    END IF;
+END
+$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'message_type') THEN
+        CREATE TYPE message_type AS ENUM ('plain', 'ai_suggestion', 'system');
+    END IF;
+END
+$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'agreement_status') THEN
+        CREATE TYPE agreement_status AS ENUM ('none', 'draft', 'finalized');
+    END IF;
+END
+$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'sensitivity_level') THEN
+        CREATE TYPE sensitivity_level AS ENUM ('low', 'normal', 'high');
+    END IF;
+END
+$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'role_in_case') THEN
+        CREATE TYPE role_in_case AS ENUM ('initiator', 'invited_party');
+    END IF;
+END
+$$;
 
 -- Create profiles table
 CREATE TABLE IF NOT EXISTS profiles (
