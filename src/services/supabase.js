@@ -9,5 +9,11 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables. Please check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
 }
 
-// Create and export Supabase client instance for database operations
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Create and export Supabase client instance for database operations using singleton pattern
+let supabaseInstance = null;
+export const supabase = (() => {
+  if (!supabaseInstance) {
+    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
+  }
+  return supabaseInstance;
+})();

@@ -27,12 +27,12 @@ export const CaseProvider = ({ children }) => {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching cases:', error);
+        console.error('Error fetching cases:', error?.message || JSON.stringify(error));
       } else {
         setCases(data || []);
       }
     } catch (err) {
-      console.error('Error fetching cases:', err);
+      console.error('Error fetching cases:', err?.message || JSON.stringify(err));
     }
     setLoading(false);
   };
