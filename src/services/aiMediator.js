@@ -13,6 +13,30 @@ const openai = new OpenAI({
 // System prompt that defines the AI mediator's role and behavior
 const SYSTEM_PROMPT = "You are an impartial, neutral mediator facilitating a conversation between two parties. Your role is to help them reach a fair agreement by summarizing discussions, suggesting compromises, rephrasing messages calmly, and drafting agreements. Always remain neutral and professional.";
 
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+const callOpenAIWithRetry = async (messages, maxRetries = 3) => {
+  let attempt = 0;
+  while (attempt < maxRetries) {
+    try {
+      const response = await openai.chat.completions.create({
+        model: OPENAI_MODEL,
+        messages,
+      });
+      return response;
+    } catch (error) {
+      if (error.status === 429 && attempt < maxRetries - 1) {
+        const delay = Math.pow(2, attempt) * 1000; // Exponential backoff
+        console.warn(`Rate limit exceeded. Retrying in ${delay}ms...`);
+        await sleep(delay);
+        attempt++;
+      } else {
+        throw error;
+      }
+    }
+  }
+};
+
 // Generate a neutral summary of the current mediation situation
 export async function summarizeSituation(caseMeta, partyContexts, recentMessages) {
   try {
@@ -27,11 +51,7 @@ Recent Messages: ${recentMessages.map(m => `${m.sender}: ${m.content}`).join('\n
 
 Please provide a neutral summary of the current situation in the mediation.`;
 
-    // Call OpenAI API with GPT-4 model
-    const response = await openai.chat.completions.create({
-      model: OPENAI_MODEL,
-      messages: [{ role: 'user', content: prompt }],
-    });
+    const response = await callOpenAIWithRetry([{ role: 'user', content: prompt }]);
 
     return response.choices[0].message.content;
   } catch (error) {
@@ -55,10 +75,7 @@ Current Agreement Draft: ${agreementDraft || 'None'}
 
 Please suggest compromise options that could help the parties reach an agreement.`;
 
-    const response = await openai.chat.completions.create({
-      model: OPENAI_MODEL,
-      messages: [{ role: 'user', content: prompt }],
-    });
+    const response = await callOpenAIWithRetry([{ role: 'user', content: prompt }]);
 
     return response.choices[0].message.content;
   } catch (error) {
@@ -74,10 +91,7 @@ export async function rephraseMessage(lastMessage) {
 
 Please rephrase the following message more calmly and professionally: "${lastMessage}"`;
 
-    const response = await openai.chat.completions.create({
-      model: OPENAI_MODEL,
-      messages: [{ role: 'user', content: prompt }],
-    });
+    const response = await callOpenAIWithRetry([{ role: 'user', content: prompt }]);
 
     return response.choices[0].message.content;
   } catch (error) {
@@ -99,10 +113,7 @@ Recent Messages: ${recentMessages.map(m => `${m.sender}: ${m.content}`).join('\n
 
 Please generate or update a draft agreement based on the discussion.`;
 
-    const response = await openai.chat.completions.create({
-      model: OPENAI_MODEL,
-      messages: [{ role: 'user', content: prompt }],
-    });
+    const response = await callOpenAIWithRetry([{ role: 'user', content: prompt }]);
 
     return response.choices[0].message.content;
   } catch (error) {
@@ -122,10 +133,7 @@ Please improve the clarity, readability, and neutrality of the following agreeme
 
 Make it more professional, clear, and balanced.`;
 
-    const response = await openai.chat.completions.create({
-      model: OPENAI_MODEL,
-      messages: [{ role: 'user', content: prompt }],
-    });
+    const response = await callOpenAIWithRetry([{ role: 'user', content: prompt }]);
 
     return response.choices[0].message.content;
   } catch (error) {
