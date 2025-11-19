@@ -20,15 +20,19 @@ export const CaseProvider = ({ children }) => {
 
   const fetchCases = async () => {
     if (!user) return;
-    const { data, error } = await supabase
-      .from('cases')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('cases')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching cases:', error);
-    } else {
-      setCases(data || []);
+      if (error) {
+        console.error('Error fetching cases:', error);
+      } else {
+        setCases(data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching cases:', err);
     }
     setLoading(false);
   };

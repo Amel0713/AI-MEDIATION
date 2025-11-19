@@ -81,6 +81,7 @@ export const AuthProvider = ({ children }) => {
 
   // Sign up with email, password, and full name
   const signUp = async (email, password, fullName) => {
+    const redirectTo = import.meta.env.VITE_SITE_URL || 'http://localhost:5173';
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -88,6 +89,7 @@ export const AuthProvider = ({ children }) => {
         data: {
           full_name: fullName,
         },
+        redirectTo,
       },
     });
     if (error) {
