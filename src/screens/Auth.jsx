@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
-import { LogIn, UserPlus, Mail, Lock, Chrome } from 'lucide-react';
+import { LogIn, UserPlus, Mail, Lock, Chrome, Scale } from 'lucide-react';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -36,36 +36,40 @@ const Auth = () => {
   };
 
   const handleGoogleSignIn = async () => {
+    setError('');
     try {
       await signInWithGoogle();
-      // OAuth will redirect, so no need to navigate here
+      navigate('/dashboard');
     } catch (err) {
       setError(err.message);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-neutral-50 via-primary-50 to-primary-100 px-4 sm:px-6 lg:px-8 animate-fade-in">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-black px-4 sm:px-6 lg:px-8 animate-fade-in">
       <div className="w-full max-w-md space-y-8 animate-scale-in">
         {/* Auth Form */}
-        <Card className="shadow-2xl border border-neutral-200/50 bg-white/95 backdrop-blur-lg" hover>
+        <Card className="shadow-2xl border border-gray-600 bg-black/50 backdrop-blur-lg text-white" hover>
           <div className="text-center mb-8 animate-slide-up">
             <img
               src="/mediatorai.png"
               alt="MediatorAI Logo"
               className="mx-auto h-20 w-auto mb-4 transition-transform duration-300 hover:scale-105"
             />
-            <h1 className="text-2xl font-bold text-neutral-900">Welcome to MediatorAI</h1>
-            <p className="text-neutral-600 mt-2">Peaceful dispute resolution powered by AI</p>
+            <h1 className="text-4xl font-bold text-white flex items-center justify-center gap-2">
+              <Scale className="h-10 w-10" />
+              Welcome to MediatorAI
+            </h1>
+            <p className="text-white mt-2">Peaceful dispute resolution powered by AI</p>
           </div>
-          <div className="flex mb-8 bg-neutral-100 rounded-xl p-1">
+          <div className="flex mb-8 bg-gray-800 rounded-xl p-1">
             <button
               type="button"
               onClick={() => setIsLogin(true)}
               className={`flex-1 py-3 px-4 text-center font-semibold rounded-lg transition-all duration-200 ${
                 isLogin
-                  ? 'bg-white text-primary-700 shadow-sm'
-                  : 'text-neutral-600 hover:text-neutral-900'
+                  ? 'bg-gray-700 text-white shadow-sm'
+                  : 'text-white hover:text-white'
               }`}
             >
               Sign In
@@ -75,28 +79,25 @@ const Auth = () => {
               onClick={() => setIsLogin(false)}
               className={`flex-1 py-3 px-4 text-center font-semibold rounded-lg transition-all duration-200 ${
                 !isLogin
-                  ? 'bg-white text-primary-700 shadow-sm'
-                  : 'text-neutral-600 hover:text-neutral-900'
+                  ? 'bg-gray-700 text-white shadow-sm'
+                  : 'text-white hover:text-white'
               }`}
             >
               Sign Up
             </button>
           </div>
-          <Button
-            onClick={handleGoogleSignIn}
-            variant="outline"
-            className="w-full mb-6 flex items-center justify-center gap-3"
-            lift
-          >
-            <Chrome className="h-5 w-5" />
-            Continue with Google
-          </Button>
-          <div className="relative mb-8">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-neutral-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-neutral-500 font-medium">Or continue with email</span>
+          <div className="space-y-4">
+            <Button onClick={handleGoogleSignIn} className="w-full flex items-center justify-center gap-2" variant="outline">
+              <Chrome className="h-5 w-5" />
+              Continue with Google
+            </Button>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-gray-600" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-black/50 text-white">Or continue with email</span>
+              </div>
             </div>
           </div>
           <form onSubmit={handleSubmit} className="space-y-6">

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
+import { useAuth } from './AuthContext';
 
 const CaseContext = createContext();
 
@@ -12,11 +13,13 @@ export const useCase = () => {
 };
 
 export const CaseProvider = ({ children }) => {
+  const { user } = useAuth();
   const [currentCase, setCurrentCase] = useState(null);
   const [cases, setCases] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchCases = async () => {
+    if (!user) return;
     const { data, error } = await supabase
       .from('cases')
       .select('*')
@@ -32,7 +35,7 @@ export const CaseProvider = ({ children }) => {
 
   useEffect(() => {
     fetchCases();
-  }, []);
+  }, [user]);
 
   const createDraftCase = async (caseData) => {
     const { data: { user } } = await supabase.auth.getUser();
