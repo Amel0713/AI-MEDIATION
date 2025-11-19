@@ -14,6 +14,7 @@ const MediationRoom = () => {
   const navigate = useNavigate();
   const { currentCase } = useCase(); // Current case data from context
   const { user } = useAuth(); // Current authenticated user
+  const [caseData, setCaseData] = useState(null); // Local case data
   const [message, setMessage] = useState(''); // Current message being typed
   const [messages, setMessages] = useState([]); // Chat messages
   const [participants, setParticipants] = useState([]); // Case participants
@@ -75,13 +76,39 @@ const MediationRoom = () => {
 
   // Initialize component and set up real-time subscriptions
   useEffect(() => {
-    // Redirect if case doesn't exist or ID mismatch
-    if (!currentCase || currentCase.id !== caseId) {
-      navigate('/dashboard');
-      return;
-    }
+    const initializeCase = async () => {
+      let fetchedCase = currentCase;
 
-    fetchData();
+      // If currentCase is not set or doesn't match, fetch from DB
+      if (!fetchedCase || fetchedCase.id !== caseId) {
+        try {
+          const { data, error } = await supabase
+            .from('cases')
+            .select('*')
+            .eq('id', caseId)
+            .single();
+
+          if (error) {
+            console.error('Error fetching case:', error);
+            navigate('/dashboard');
+            return;
+          }
+
+          fetchedCase = data;
+          setCaseData(data);
+        } catch (err) {
+          console.error('Error initializing case:', err);
+          navigate('/dashboard');
+          return;
+        }
+      } else {
+        setCaseData(fetchedCase);
+      }
+
+      fetchData();
+    };
+
+    initializeCase();
 
     // Real-time subscription for new messages
     const messagesChannel = supabase
@@ -169,7 +196,7 @@ const MediationRoom = () => {
   };
 
   const handleSummarize = async () => {
-    const caseMeta = { title: currentCase.title, type: currentCase.type };
+    const caseMeta = { title: caseData.title, type: caseData.type };
     const partyContexts = getPartyContexts();
     const recentMessages = messages.slice(-50).map(msg => ({
       sender: getSenderName(msg),
@@ -187,7 +214,7 @@ const MediationRoom = () => {
   };
 
   const handleSuggestCompromises = async () => {
-    const caseMeta = { title: currentCase.title, type: currentCase.type };
+    const caseMeta = { title: caseData.title, type: caseData.type };
     const partyContexts = getPartyContexts();
     const recentMessages = messages.slice(-50).map(msg => ({
       sender: getSenderName(msg),
@@ -217,7 +244,7 @@ const MediationRoom = () => {
   };
 
   const handleGenerateDraft = async () => {
-    const caseMeta = { title: currentCase.title, type: currentCase.type };
+    const caseMeta = { title: caseData.title, type: caseData.type };
     const partyContexts = getPartyContexts();
     const recentMessages = messages.slice(-50).map(msg => ({
       sender: getSenderName(msg),
@@ -270,7 +297,7 @@ const MediationRoom = () => {
     }
   };
 
-  if (!currentCase || loading) {
+  if (!caseData || loading) {
     return <div>Loading...</div>;
   }
 
@@ -283,7 +310,7 @@ const MediationRoom = () => {
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">{currentCase.title}</h1>
+        <h1 className="text-3xl font-bold">{caseData.title}</h1>
         <Button onClick={() => navigate('/dashboard')} variant="outline">
           Back to Dashboard
         </Button>
@@ -373,7 +400,7 @@ const MediationRoom = () => {
               {activeTab === 'summary' && (
                 <div>
                   <h3 className="font-semibold mb-2">AI Summary</h3>
-                  <p>{currentCase.ai_summary || 'No summary available yet.'}</p>
+                  <p>{caseData.ai_summary || 'No summary available yet.'}</p>
                 </div>
               )}
 
