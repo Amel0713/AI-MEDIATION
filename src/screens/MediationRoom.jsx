@@ -139,6 +139,14 @@ const MediationRoom = () => {
     return 'Unknown';
   };
 
+  const getPartyContexts = () => {
+    return contexts.map(ctx => {
+      const participant = participants.find(p => p.user_id === ctx.user_id);
+      const party = participant?.role_in_case === 'initiator' ? 'Party A' : 'Party B';
+      return { party, background: ctx.background_text, goals: ctx.goals_text, acceptableOutcome: ctx.acceptable_outcome_text, constraints: ctx.constraints_text };
+    });
+  };
+
   const handleSendMessage = async () => {
     if (!message.trim() || !user) return;
 
@@ -162,11 +170,7 @@ const MediationRoom = () => {
 
   const handleSummarize = async () => {
     const caseMeta = { title: currentCase.title, type: currentCase.type };
-    const partyContexts = contexts.map(ctx => {
-      const participant = participants.find(p => p.user_id === ctx.user_id);
-      const party = participant?.role_in_case === 'initiator' ? 'Party A' : 'Party B';
-      return { party, background: ctx.background_text, goals: ctx.goals_text, acceptableOutcome: ctx.acceptable_outcome_text, constraints: ctx.constraints_text };
-    });
+    const partyContexts = getPartyContexts();
     const recentMessages = messages.slice(-50).map(msg => ({
       sender: getSenderName(msg),
       content: msg.content
@@ -184,11 +188,7 @@ const MediationRoom = () => {
 
   const handleSuggestCompromises = async () => {
     const caseMeta = { title: currentCase.title, type: currentCase.type };
-    const partyContexts = contexts.map(ctx => {
-      const participant = participants.find(p => p.user_id === ctx.user_id);
-      const party = participant?.role_in_case === 'initiator' ? 'Party A' : 'Party B';
-      return { party, background: ctx.background_text, goals: ctx.goals_text, acceptableOutcome: ctx.acceptable_outcome_text, constraints: ctx.constraints_text };
-    });
+    const partyContexts = getPartyContexts();
     const recentMessages = messages.slice(-50).map(msg => ({
       sender: getSenderName(msg),
       content: msg.content
@@ -218,11 +218,7 @@ const MediationRoom = () => {
 
   const handleGenerateDraft = async () => {
     const caseMeta = { title: currentCase.title, type: currentCase.type };
-    const partyContexts = contexts.map(ctx => {
-      const participant = participants.find(p => p.user_id === ctx.user_id);
-      const party = participant?.role_in_case === 'initiator' ? 'Party A' : 'Party B';
-      return { party, background: ctx.background_text, goals: ctx.goals_text, acceptableOutcome: ctx.acceptable_outcome_text, constraints: ctx.constraints_text };
-    });
+    const partyContexts = getPartyContexts();
     const recentMessages = messages.slice(-50).map(msg => ({
       sender: getSenderName(msg),
       content: msg.content

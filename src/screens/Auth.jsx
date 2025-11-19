@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
-import { LogIn, UserPlus, Mail, Lock, Chrome } from 'lucide-react';
+import { LogIn, UserPlus, Mail, Lock, Chrome, Scale } from 'lucide-react';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -56,7 +56,10 @@ const Auth = () => {
               alt="MediatorAI Logo"
               className="mx-auto h-20 w-auto mb-4 transition-transform duration-300 hover:scale-105"
             />
-            <h1 className="text-2xl font-bold text-white">Welcome to MediatorAI</h1>
+            <h1 className="text-4xl font-bold text-white flex items-center justify-center gap-2">
+              <Scale className="h-10 w-10" />
+              Welcome to MediatorAI
+            </h1>
             <p className="text-gray-300 mt-2">Peaceful dispute resolution powered by AI</p>
           </div>
           <div className="flex mb-8 bg-gray-800 rounded-xl p-1">

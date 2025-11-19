@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useCase } from '../contexts/CaseContext';
 import Card from '../components/Card';
 import Input from '../components/Input';
+import Textarea from '../components/Textarea';
 import Button from '../components/Button';
 
 const JoinCase = () => {
@@ -101,57 +102,40 @@ const JoinCase = () => {
         </h1>
         <p className="mb-8 text-neutral-600 text-center text-lg">Case: <span className="font-semibold">{caseData.title}</span></p>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="animate-slide-up">
-            <label className="block text-sm font-semibold text-neutral-700 mb-2">
-              Background
-            </label>
-            <textarea
-              value={contextData.backgroundText}
-              onChange={(e) => handleInputChange('backgroundText', e.target.value)}
-              placeholder="Provide background information"
-              className="w-full px-4 py-3 border-2 border-neutral-300 rounded-xl bg-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:bg-neutral-50 resize-none"
-              rows={3}
-              required
-            />
-          </div>
-          <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
-            <label className="block text-sm font-semibold text-neutral-700 mb-2">
-              Goals
-            </label>
-            <textarea
-              value={contextData.goalsText}
-              onChange={(e) => handleInputChange('goalsText', e.target.value)}
-              placeholder="What are your goals?"
-              className="w-full px-4 py-3 border-2 border-neutral-300 rounded-xl bg-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:bg-neutral-50 resize-none"
-              rows={3}
-              required
-            />
-          </div>
-          <div className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
-            <label className="block text-sm font-semibold text-neutral-700 mb-2">
-              Acceptable Outcome
-            </label>
-            <textarea
-              value={contextData.acceptableOutcomeText}
-              onChange={(e) => handleInputChange('acceptableOutcomeText', e.target.value)}
-              placeholder="What outcome would be acceptable?"
-              className="w-full px-4 py-3 border-2 border-neutral-300 rounded-xl bg-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:bg-neutral-50 resize-none"
-              rows={3}
-              required
-            />
-          </div>
-          <div className="animate-slide-up" style={{ animationDelay: '0.3s' }}>
-            <label className="block text-sm font-semibold text-neutral-700 mb-2">
-              Constraints
-            </label>
-            <textarea
-              value={contextData.constraintsText}
-              onChange={(e) => handleInputChange('constraintsText', e.target.value)}
-              placeholder="Any constraints or limitations?"
-              className="w-full px-4 py-3 border-2 border-neutral-300 rounded-xl bg-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:bg-neutral-50 resize-none"
-              rows={3}
-            />
-          </div>
+           <Textarea
+             label="Background"
+             value={contextData.backgroundText}
+             onChange={(e) => handleInputChange('backgroundText', e.target.value)}
+             placeholder="Provide background information"
+             required
+             className="animate-slide-up"
+           />
+           <Textarea
+             label="Goals"
+             value={contextData.goalsText}
+             onChange={(e) => handleInputChange('goalsText', e.target.value)}
+             placeholder="What are your goals?"
+             required
+             className="animate-slide-up"
+             style={{ animationDelay: '0.1s' }}
+           />
+           <Textarea
+             label="Acceptable Outcome"
+             value={contextData.acceptableOutcomeText}
+             onChange={(e) => handleInputChange('acceptableOutcomeText', e.target.value)}
+             placeholder="What outcome would be acceptable?"
+             required
+             className="animate-slide-up"
+             style={{ animationDelay: '0.2s' }}
+           />
+           <Textarea
+             label="Constraints"
+             value={contextData.constraintsText}
+             onChange={(e) => handleInputChange('constraintsText', e.target.value)}
+             placeholder="Any constraints or limitations?"
+             className="animate-slide-up"
+             style={{ animationDelay: '0.3s' }}
+           />
           <div className="animate-slide-up" style={{ animationDelay: '0.4s' }}>
             <label className="block text-sm font-semibold text-neutral-700 mb-2">
               Sensitivity Level
