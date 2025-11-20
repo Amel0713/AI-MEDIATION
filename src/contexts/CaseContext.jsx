@@ -56,16 +56,6 @@ export const CaseProvider = ({ children }) => {
         userId: user.id,
       });
       const startTime = Date.now();
-      const abortController = new AbortController();
-      const timeoutId = setTimeout(() => {
-        console.log({
-          timestamp: new Date().toISOString(),
-          operation: 'fetchCases',
-          status: 'timeoutTriggered',
-          userId: user.id,
-        });
-        abortController.abort();
-      }, 10000);
       console.log({
         timestamp: new Date().toISOString(),
         operation: 'fetchCases',
@@ -76,9 +66,7 @@ export const CaseProvider = ({ children }) => {
       const { data, error } = await supabase
         .from('cases')
         .select('*')
-        .order('created_at', { ascending: false })
-        .abortSignal(abortController.signal);
-      clearTimeout(timeoutId);
+        .order('created_at', { ascending: false });
       const endTime = Date.now();
       console.log({
         timestamp: new Date().toISOString(),
@@ -97,14 +85,6 @@ export const CaseProvider = ({ children }) => {
       }
     } catch (err) {
       console.error('Exception in fetchCases:', err?.message || JSON.stringify(err));
-      if (err.name === 'AbortError') {
-        console.log({
-          timestamp: new Date().toISOString(),
-          operation: 'fetchCases',
-          status: 'aborted',
-          userId: user.id,
-        });
-      }
     }
     console.log({
       timestamp: new Date().toISOString(),
