@@ -20,63 +20,129 @@ export const AuthProvider = ({ children }) => {
   const ensureProfileExists = async (user) => {
     if (!user) return;
 
-    try {
-      console.log('AuthContext: Checking if profile exists for user:', user.id);
-      // Check if profile already exists
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', user.id)
-        .single();
+    console.log({
+      timestamp: new Date().toISOString(),
+      userId: user.id,
+      operation: 'ensureProfileExists',
+      status: 'start',
+    });
 
-      if (error && error.code === 'PGRST116') {
-        console.log('AuthContext: Profile does not exist, creating...');
-        const { error: insertError } = await supabase
-          .from('profiles')
-          .insert({
-            id: user.id,
-            email: user.email,
-            full_name: user.user_metadata?.full_name || null,
-          });
-        if (insertError) {
-          console.error('AuthContext: Error creating profile:', insertError);
-        } else {
-          console.log('AuthContext: Profile created successfully');
-        }
-      } else if (error) {
-        console.error('AuthContext: Error checking profile:', error);
-      } else {
-        console.log('AuthContext: Profile already exists');
+    console.log({
+      timestamp: new Date().toISOString(),
+      userId: user.id,
+      operation: 'ensureProfileExists',
+      status: 'beforeProfileSelect',
+    });
+    const startTime = Date.now();
+    // Check if profile already exists
+    const { error } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', user.id)
+      .single();
+    const endTime = Date.now();
+    console.log({
+      timestamp: new Date().toISOString(),
+      userId: user.id,
+      operation: 'ensureProfileExists',
+      status: 'afterProfileSelect',
+      duration: endTime - startTime,
+      error: error?.message,
+      errorCode: error?.code,
+    });
+
+    // If profile doesn't exist (PGRST116 = no rows), create it
+    if (error && error.code === 'PGRST116') {
+      console.log({
+        timestamp: new Date().toISOString(),
+        userId: user.id,
+        operation: 'ensureProfileExists',
+        status: 'beforeProfileInsert',
+      });
+      const insertStart = Date.now();
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .insert({
+          id: user.id,
+          email: user.email,
+          full_name: user.user_metadata?.full_name || null,
+        });
+      const insertEnd = Date.now();
+      console.log({
+        timestamp: new Date().toISOString(),
+        userId: user.id,
+        operation: 'ensureProfileExists',
+        status: 'afterProfileInsert',
+        duration: insertEnd - insertStart,
+        insertError: insertError?.message,
+      });
+      if (insertError) {
+        console.log({
+          timestamp: new Date().toISOString(),
+          userId: user.id,
+          operation: 'ensureProfileExists',
+          status: 'error',
+          error: insertError.message,
+        });
       }
-    } catch (err) {
-      console.error('AuthContext: Unexpected error in ensureProfileExists:', err);
+    } else {
+      console.log({
+        timestamp: new Date().toISOString(),
+        userId: user.id,
+        operation: 'ensureProfileExists',
+        status: 'profileExists',
+        error: error?.message,
+      });
     }
+
+    console.log({
+      timestamp: new Date().toISOString(),
+      userId: user.id,
+      operation: 'ensureProfileExists',
+      status: 'end',
+    });
   };
 
   // Initialize authentication state and set up auth state listener
   useEffect(() => {
     // Get initial session on app load
     const getSession = async () => {
-      try {
-        console.log('AuthContext: Getting initial session...');
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) {
-          console.error('AuthContext: Error getting session:', error);
-          setLoading(false);
-          return;
-        }
-        console.log('AuthContext: Session retrieved:', session ? 'authenticated' : 'no session');
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          console.log('AuthContext: Ensuring profile exists for user:', session.user.id);
-          await ensureProfileExists(session.user);
-        }
-        setLoading(false);
-        console.log('AuthContext: Loading set to false');
-      } catch (err) {
-        console.error('AuthContext: Unexpected error in getSession:', err);
-        setLoading(false);
+      console.log({
+        timestamp: new Date().toISOString(),
+        operation: 'getSession',
+        status: 'start',
+        loading: loading,
+      });
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        console.log({
+          timestamp: new Date().toISOString(),
+          operation: 'getSession',
+          status: 'beforeEnsureProfile',
+          loading: loading,
+        });
+        await ensureProfileExists(session.user);
+        console.log({
+          timestamp: new Date().toISOString(),
+          operation: 'getSession',
+          status: 'afterEnsureProfile',
+          loading: loading,
+        });
       }
+      console.log({
+        timestamp: new Date().toISOString(),
+        operation: 'getSession',
+        status: 'beforeSetLoadingFalse',
+        loading: loading,
+      });
+      setLoading(false);
+      console.log({
+        timestamp: new Date().toISOString(),
+        operation: 'getSession',
+        status: 'afterSetLoadingFalse',
+        loading: false,
+      });
     };
 
     getSession();
@@ -84,12 +150,47 @@ export const AuthProvider = ({ children }) => {
     // Listen for auth state changes (login, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
-        console.log('Auth state change:', _event, 'user:', session?.user?.id);
+        console.log({
+          timestamp: new Date().toISOString(),
+          userId: session?.user?.id,
+          operation: 'authStateChange',
+          event: _event,
+          hasSession: !!session,
+          loading: loading,
+        });
         setUser(session?.user ?? null);
         if (session?.user) {
+          console.log({
+            timestamp: new Date().toISOString(),
+            userId: session?.user?.id,
+            operation: 'authStateChange',
+            status: 'beforeEnsureProfile',
+            loading: loading,
+          });
           await ensureProfileExists(session.user);
+          console.log({
+            timestamp: new Date().toISOString(),
+            userId: session?.user?.id,
+            operation: 'authStateChange',
+            status: 'afterEnsureProfile',
+            loading: loading,
+          });
         }
+        console.log({
+          timestamp: new Date().toISOString(),
+          userId: session?.user?.id,
+          operation: 'authStateChange',
+          status: 'beforeSetLoadingFalse',
+          loading: loading,
+        });
         setLoading(false);
+        console.log({
+          timestamp: new Date().toISOString(),
+          userId: session?.user?.id,
+          operation: 'authStateChange',
+          status: 'afterSetLoadingFalse',
+          loading: false,
+        });
       }
     );
 
@@ -99,54 +200,144 @@ export const AuthProvider = ({ children }) => {
 
   // Sign in with email and password
   const signIn = async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    console.log({
+      timestamp: new Date().toISOString(),
+      operation: 'signIn',
+      status: 'attempt',
+      email: email, // Note: email is not sensitive, but password is not logged
     });
-    if (error) throw error;
-    return data;
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      console.log({
+        timestamp: new Date().toISOString(),
+        userId: data?.user?.id,
+        operation: 'signIn',
+        status: 'success',
+        email: email,
+      });
+      return data;
+    } catch (error) {
+      console.log({
+        timestamp: new Date().toISOString(),
+        operation: 'signIn',
+        status: 'failure',
+        email: email,
+        error: error.message,
+      });
+      throw error;
+    }
   };
 
   // Sign up with email, password, and full name
   const signUp = async (email, password, fullName) => {
-    const redirectTo = import.meta.env.VITE_SITE_URL || 'http://localhost:5173';
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-        },
-        redirectTo,
-      },
+    console.log({
+      timestamp: new Date().toISOString(),
+      operation: 'signUp',
+      status: 'attempt',
+      email: email,
+      fullName: fullName,
     });
-    if (error) {
-      if (error.status === 429) {
-        throw new Error('Too many sign-up attempts. Please wait a few minutes before trying again.');
-      } else {
-        throw error;
+    try {
+      const redirectTo = import.meta.env.VITE_SITE_URL || 'http://localhost:5173';
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+          },
+          redirectTo,
+        },
+      });
+      if (error) {
+        if (error.status === 429) {
+          throw new Error('Too many sign-up attempts. Please wait a few minutes before trying again.');
+        } else {
+          throw error;
+        }
       }
+      console.log({
+        timestamp: new Date().toISOString(),
+        userId: data?.user?.id,
+        operation: 'signUp',
+        status: 'success',
+        email: email,
+        fullName: fullName,
+      });
+      return data;
+    } catch (error) {
+      console.log({
+        timestamp: new Date().toISOString(),
+        operation: 'signUp',
+        status: 'failure',
+        email: email,
+        fullName: fullName,
+        error: error.message,
+      });
+      throw error;
     }
-
-    return data;
   };
 
   // Sign in with Google OAuth
   const signInWithGoogle = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.origin + '/dashboard',
-      },
+    console.log({
+      timestamp: new Date().toISOString(),
+      operation: 'signInWithGoogle',
+      status: 'attempt',
     });
-    if (error) throw error;
-    return data;
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+      });
+      if (error) throw error;
+      console.log({
+        timestamp: new Date().toISOString(),
+        operation: 'signInWithGoogle',
+        status: 'success',
+      });
+      return data;
+    } catch (error) {
+      console.log({
+        timestamp: new Date().toISOString(),
+        operation: 'signInWithGoogle',
+        status: 'failure',
+        error: error.message,
+      });
+      throw error;
+    }
   };
 
   // Sign out current user
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    console.log({
+      timestamp: new Date().toISOString(),
+      userId: user?.id,
+      operation: 'signOut',
+      status: 'attempt',
+    });
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      console.log({
+        timestamp: new Date().toISOString(),
+        userId: user?.id,
+        operation: 'signOut',
+        status: 'success',
+      });
+    } catch (error) {
+      console.log({
+        timestamp: new Date().toISOString(),
+        userId: user?.id,
+        operation: 'signOut',
+        status: 'failure',
+        error: error.message,
+      });
+      throw error;
+    }
   };
 
   const value = {
