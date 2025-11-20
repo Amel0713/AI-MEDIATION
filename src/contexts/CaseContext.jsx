@@ -62,11 +62,21 @@ export const CaseProvider = ({ children }) => {
         status: 'beforeSupabaseCall',
         userId: user.id,
       });
-      // Simplified query to avoid potential RLS performance issues
-      const { data, error } = await supabase
+
+      // Add timeout to detect hanging queries
+      const queryPromise = supabase
         .from('cases')
         .select('*')
         .order('created_at', { ascending: false });
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Query timeout after 10 seconds')), 10000)
+      );
+
+      const { data, error } = await Promise.race([queryPromise, timeoutPromise]).catch(err => {
+        console.error('Query timed out or failed:', err.message);
+        return { data: null, error: err };
+      });
       const endTime = Date.now();
       console.log({
         timestamp: new Date().toISOString(),
