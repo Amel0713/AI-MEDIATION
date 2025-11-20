@@ -72,9 +72,10 @@ export const CaseProvider = ({ children }) => {
         status: 'beforeSupabaseCall',
         userId: user.id,
       });
+      // Simplified query to avoid potential RLS performance issues
       const { data, error } = await supabase
         .from('cases')
-        .select('*, case_participants(user_id, role_in_case)')
+        .select('*')
         .order('created_at', { ascending: false })
         .abortSignal(abortController.signal);
       clearTimeout(timeoutId);
