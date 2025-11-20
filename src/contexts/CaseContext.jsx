@@ -57,7 +57,21 @@ export const CaseProvider = ({ children }) => {
       });
       const startTime = Date.now();
       const abortController = new AbortController();
-      const timeoutId = setTimeout(() => abortController.abort(), 10000);
+      const timeoutId = setTimeout(() => {
+        console.log({
+          timestamp: new Date().toISOString(),
+          operation: 'fetchCases',
+          status: 'timeoutTriggered',
+          userId: user.id,
+        });
+        abortController.abort();
+      }, 10000);
+      console.log({
+        timestamp: new Date().toISOString(),
+        operation: 'fetchCases',
+        status: 'beforeSupabaseCall',
+        userId: user.id,
+      });
       const { data, error } = await supabase
         .from('cases')
         .select('*, case_participants(user_id, role_in_case)')
@@ -82,6 +96,14 @@ export const CaseProvider = ({ children }) => {
       }
     } catch (err) {
       console.error('Exception in fetchCases:', err?.message || JSON.stringify(err));
+      if (err.name === 'AbortError') {
+        console.log({
+          timestamp: new Date().toISOString(),
+          operation: 'fetchCases',
+          status: 'aborted',
+          userId: user.id,
+        });
+      }
     }
     console.log({
       timestamp: new Date().toISOString(),

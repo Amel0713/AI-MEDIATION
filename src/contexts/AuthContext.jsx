@@ -34,65 +34,79 @@ export const AuthProvider = ({ children }) => {
       status: 'beforeProfileSelect',
     });
     const startTime = Date.now();
-    // Check if profile already exists
-    const { error } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('id', user.id)
-      .single();
-    const endTime = Date.now();
-    console.log({
-      timestamp: new Date().toISOString(),
-      userId: user.id,
-      operation: 'ensureProfileExists',
-      status: 'afterProfileSelect',
-      duration: endTime - startTime,
-      error: error?.message,
-      errorCode: error?.code,
-    });
-
-    // If profile doesn't exist (PGRST116 = no rows), create it
-    if (error && error.code === 'PGRST116') {
-      console.log({
-        timestamp: new Date().toISOString(),
-        userId: user.id,
-        operation: 'ensureProfileExists',
-        status: 'beforeProfileInsert',
-      });
-      const insertStart = Date.now();
-      const { error: insertError } = await supabase
+    try {
+      // Check if profile already exists
+      const { data, error } = await supabase
         .from('profiles')
-        .insert({
-          id: user.id,
-          email: user.email,
-          full_name: user.user_metadata?.full_name || null,
-        });
-      const insertEnd = Date.now();
+        .select('id')
+        .eq('id', user.id)
+        .single();
+      const endTime = Date.now();
       console.log({
         timestamp: new Date().toISOString(),
         userId: user.id,
         operation: 'ensureProfileExists',
-        status: 'afterProfileInsert',
-        duration: insertEnd - insertStart,
-        insertError: insertError?.message,
+        status: 'afterProfileSelect',
+        duration: endTime - startTime,
+        error: error?.message,
+        errorCode: error?.code,
+        data: data,
       });
-      if (insertError) {
+
+      // If profile doesn't exist (PGRST116 = no rows), create it
+      if (error && error.code === 'PGRST116') {
         console.log({
           timestamp: new Date().toISOString(),
           userId: user.id,
           operation: 'ensureProfileExists',
-          status: 'error',
-          error: insertError.message,
+          status: 'beforeProfileInsert',
+        });
+        const insertStart = Date.now();
+        const { data: insertData, error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            email: user.email,
+            full_name: user.user_metadata?.full_name || null,
+          })
+          .select();
+        const insertEnd = Date.now();
+        console.log({
+          timestamp: new Date().toISOString(),
+          userId: user.id,
+          operation: 'ensureProfileExists',
+          status: 'afterProfileInsert',
+          duration: insertEnd - insertStart,
+          insertError: insertError?.message,
+          insertData: insertData,
+        });
+        if (insertError) {
+          console.log({
+            timestamp: new Date().toISOString(),
+            userId: user.id,
+            operation: 'ensureProfileExists',
+            status: 'error',
+            error: insertError.message,
+          });
+        }
+      } else if (!error) {
+        console.log({
+          timestamp: new Date().toISOString(),
+          userId: user.id,
+          operation: 'ensureProfileExists',
+          status: 'profileExists',
+        });
+      } else {
+        console.log({
+          timestamp: new Date().toISOString(),
+          userId: user.id,
+          operation: 'ensureProfileExists',
+          status: 'unexpectedError',
+          error: error?.message,
         });
       }
-    } else {
-      console.log({
-        timestamp: new Date().toISOString(),
-        userId: user.id,
-        operation: 'ensureProfileExists',
-        status: 'profileExists',
-        error: error?.message,
-      });
+    } catch (err) {
+      console.error('Exception in ensureProfileExists:', err?.message || JSON.stringify(err));
     }
 
     console.log({
