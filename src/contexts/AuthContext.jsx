@@ -20,23 +20,36 @@ export const AuthProvider = ({ children }) => {
   const ensureProfileExists = async (user) => {
     if (!user) return;
 
-    // Check if profile already exists
-    const { error } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('id', user.id)
-      .single();
-
-    // If profile doesn't exist (PGRST116 = no rows), create it
-    if (error && error.code === 'PGRST116') {
-      const { error: insertError } = await supabase
+    try {
+      console.log('AuthContext: Checking if profile exists for user:', user.id);
+      // Check if profile already exists
+      const { data, error } = await supabase
         .from('profiles')
-        .insert({
-          id: user.id,
-          email: user.email,
-          full_name: user.user_metadata?.full_name || null,
-        });
-      if (insertError) console.error('Error creating profile:', insertError);
+        .select('id')
+        .eq('id', user.id)
+        .single();
+
+      if (error && error.code === 'PGRST116') {
+        console.log('AuthContext: Profile does not exist, creating...');
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            email: user.email,
+            full_name: user.user_metadata?.full_name || null,
+          });
+        if (insertError) {
+          console.error('AuthContext: Error creating profile:', insertError);
+        } else {
+          console.log('AuthContext: Profile created successfully');
+        }
+      } else if (error) {
+        console.error('AuthContext: Error checking profile:', error);
+      } else {
+        console.log('AuthContext: Profile already exists');
+      }
+    } catch (err) {
+      console.error('AuthContext: Unexpected error in ensureProfileExists:', err);
     }
   };
 
@@ -44,12 +57,26 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Get initial session on app load
     const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await ensureProfileExists(session.user);
+      try {
+        console.log('AuthContext: Getting initial session...');
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('AuthContext: Error getting session:', error);
+          setLoading(false);
+          return;
+        }
+        console.log('AuthContext: Session retrieved:', session ? 'authenticated' : 'no session');
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          console.log('AuthContext: Ensuring profile exists for user:', session.user.id);
+          await ensureProfileExists(session.user);
+        }
+        setLoading(false);
+        console.log('AuthContext: Loading set to false');
+      } catch (err) {
+        console.error('AuthContext: Unexpected error in getSession:', err);
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     getSession();
@@ -105,6 +132,9 @@ export const AuthProvider = ({ children }) => {
   const signInWithGoogle = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
+      options: {
+        redirectTo: window.location.origin + '/dashboard',
+      },
     });
     if (error) throw error;
     return data;

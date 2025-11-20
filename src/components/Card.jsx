@@ -14,7 +14,7 @@ const Card = ({
     large: 'p-8',
   };
 
-  const baseClasses = 'bg-gray-800 shadow-lg rounded-2xl border border-gray-700 backdrop-blur-sm transition-all duration-300 text-white';
+  const baseClasses = 'bg-white shadow-lg rounded-2xl border border-gray-200 backdrop-blur-sm transition-all duration-300 text-gray-900';
   const hoverClass = hover ? 'card-hover' : '';
 
   const classes = `${baseClasses} ${paddingClasses[padding]} ${hoverClass} ${className}`;

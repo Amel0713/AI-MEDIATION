@@ -17,9 +17,12 @@ export const CaseProvider = ({ children }) => {
   const [currentCase, setCurrentCase] = useState(null);
   const [cases, setCases] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const fetchCases = async () => {
     if (!user) return;
+    setLoading(true);
+    setError(null);
     const { data, error } = await supabase
       .from('cases')
       .select('*')
@@ -27,6 +30,7 @@ export const CaseProvider = ({ children }) => {
 
     if (error) {
       console.error('Error fetching cases:', error);
+      setError(error.message);
     } else {
       setCases(data || []);
     }
@@ -162,6 +166,7 @@ export const CaseProvider = ({ children }) => {
     currentCase,
     cases,
     loading,
+    error,
     createDraftCase,
     generateInviteToken,
     insertContext,

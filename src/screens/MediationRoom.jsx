@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCase } from '../contexts/CaseContext';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../services/supabase';
 import Card from '../components/Card';
@@ -12,7 +11,6 @@ import { summarizeSituation, suggestCompromises, rephraseMessage, generateAgreem
 const MediationRoom = () => {
   const { caseId } = useParams(); // Get case ID from URL
   const navigate = useNavigate();
-  const { currentCase } = useCase(); // Current case data from context
   const { user } = useAuth(); // Current authenticated user
   const [message, setMessage] = useState(''); // Current message being typed
   const [messages, setMessages] = useState([]); // Chat messages
@@ -24,12 +22,22 @@ const MediationRoom = () => {
   const [loading, setLoading] = useState(true); // Loading state
   const [signingParticipant, setSigningParticipant] = useState(null); // Participant being signed
   const [signingName, setSigningName] = useState(''); // Name entered for signing
+  const [caseData, setCaseData] = useState(null); // Local case data state
 
   // Fetch all case-related data from Supabase
   const fetchData = async () => {
     if (!caseId) return;
 
     try {
+      // Fetch case data first
+      const caseResult = await supabase.from('cases').select('*').eq('id', caseId).single();
+      if (caseResult.error) {
+        console.error('Error fetching case:', caseResult.error);
+        navigate('/dashboard');
+        return;
+      }
+      setCaseData(caseResult.data);
+
       // Parallel fetch for better performance
       const [messagesResult, participantsResult, contextsResult, agreementResult] = await Promise.all([
         supabase
@@ -75,12 +83,6 @@ const MediationRoom = () => {
 
   // Initialize component and set up real-time subscriptions
   useEffect(() => {
-    // Redirect if case doesn't exist or ID mismatch
-    if (!currentCase || currentCase.id !== caseId) {
-      navigate('/dashboard');
-      return;
-    }
-
     fetchData();
 
     // Real-time subscription for new messages
@@ -128,7 +130,7 @@ const MediationRoom = () => {
       supabase.removeChannel(agreementsChannel);
       supabase.removeChannel(participantsChannel);
     };
-  }, [currentCase, caseId, navigate]);
+  }, [caseId, navigate]);
 
   const getSenderName = (msg) => {
     if (msg.sender_type === 'ai') return 'AI Mediator';
@@ -169,7 +171,7 @@ const MediationRoom = () => {
   };
 
   const handleSummarize = async () => {
-    const caseMeta = { title: currentCase.title, type: currentCase.type };
+    const caseMeta = { title: caseData.title, type: caseData.type };
     const partyContexts = getPartyContexts();
     const recentMessages = messages.slice(-50).map(msg => ({
       sender: getSenderName(msg),
@@ -187,7 +189,7 @@ const MediationRoom = () => {
   };
 
   const handleSuggestCompromises = async () => {
-    const caseMeta = { title: currentCase.title, type: currentCase.type };
+    const caseMeta = { title: caseData.title, type: caseData.type };
     const partyContexts = getPartyContexts();
     const recentMessages = messages.slice(-50).map(msg => ({
       sender: getSenderName(msg),
@@ -217,7 +219,7 @@ const MediationRoom = () => {
   };
 
   const handleGenerateDraft = async () => {
-    const caseMeta = { title: currentCase.title, type: currentCase.type };
+    const caseMeta = { title: caseData.title, type: caseData.type };
     const partyContexts = getPartyContexts();
     const recentMessages = messages.slice(-50).map(msg => ({
       sender: getSenderName(msg),
@@ -270,7 +272,7 @@ const MediationRoom = () => {
     }
   };
 
-  if (!currentCase || loading) {
+  if (!caseData || loading) {
     return <div>Loading...</div>;
   }
 
@@ -283,7 +285,7 @@ const MediationRoom = () => {
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">{currentCase.title}</h1>
+        <h1 className="text-3xl font-bold">{caseData.title}</h1>
         <Button onClick={() => navigate('/dashboard')} variant="outline">
           Back to Dashboard
         </Button>
@@ -373,7 +375,7 @@ const MediationRoom = () => {
               {activeTab === 'summary' && (
                 <div>
                   <h3 className="font-semibold mb-2">AI Summary</h3>
-                  <p>{currentCase.ai_summary || 'No summary available yet.'}</p>
+                  <p>{caseData.ai_summary || 'No summary available yet.'}</p>
                 </div>
               )}
 

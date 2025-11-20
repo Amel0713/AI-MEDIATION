@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useCase } from '../contexts/CaseContext';
 import Card from '../components/Card';
 import Button from '../components/Button';
-import { Plus, Users, FolderOpen, ArrowRight } from 'lucide-react';
+import { Plus, Users, FolderOpen, ArrowRight, RefreshCw } from 'lucide-react';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { cases } = useCase();
+  const { cases, loading, error, fetchCases } = useCase();
 
   return (
     <div className="space-y-12 animate-fade-in">
@@ -62,6 +62,36 @@ const Dashboard = () => {
           </Button>
         </Card>
       </div>
+
+      {loading && (
+        <div className="text-center animate-fade-in">
+          <p className="text-xl text-neutral-600">Loading your cases...</p>
+        </div>
+      )}
+
+      {error && (
+        <Card className="animate-fade-in">
+          <div className="text-center">
+            <p className="text-lg text-red-600 mb-4">Failed to load cases: {error}</p>
+            <Button onClick={fetchCases} variant="outline" className="flex items-center gap-2">
+              <RefreshCw className="h-5 w-5" />
+              Retry
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {!loading && !error && cases.length === 0 && (
+        <Card className="animate-fade-in">
+          <div className="text-center">
+            <div className="p-3 bg-neutral-100 rounded-xl mb-4 inline-block">
+              <FolderOpen className="h-8 w-8 text-neutral-500" />
+            </div>
+            <h3 className="text-xl font-bold text-neutral-900 mb-2">No Active Cases</h3>
+            <p className="text-neutral-600">You haven't started any mediation cases yet. Create your first case to get started.</p>
+          </div>
+        </Card>
+      )}
 
       {cases.length > 0 && (
         <Card className="animate-slide-up" style={{ animationDelay: '0.3s' }}>
