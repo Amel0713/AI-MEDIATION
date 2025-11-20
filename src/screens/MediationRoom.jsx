@@ -411,20 +411,20 @@ const MediationRoom = () => {
         <div className="lg:col-span-2">
           <Card>
             <h2 className="text-xl font-semibold mb-4">Mediation Chat</h2>
-            <div className="h-96 overflow-y-auto border border-gray-300 rounded p-4 mb-4 bg-gray-50">
+            <div className="h-96 overflow-y-auto border border-gray-600 rounded p-4 mb-4 bg-gray-800">
               {messages.length === 0 ? (
-                <p className="text-gray-500">No messages yet. Start the conversation!</p>
+                <p className="text-gray-400">No messages yet. Start the conversation!</p>
               ) : (
                 messages.map((msg) => (
-                  <div key={msg.id} className="mb-3 p-3 bg-white rounded shadow-sm">
+                  <div key={msg.id} className="mb-3 p-3 bg-black rounded shadow-sm">
                     <div className="flex justify-between items-start mb-1">
-                      <strong className="text-sm text-blue-600">{getSenderName(msg)}</strong>
-                      <small className="text-gray-500 text-xs">
+                      <strong className="text-sm text-blue-400">{getSenderName(msg)}</strong>
+                      <small className="text-gray-400 text-xs">
                         {new Date(msg.created_at).toLocaleString()}
                       </small>
                     </div>
-                    <p className="text-sm">{msg.content}</p>
-                    <small className="text-gray-400 text-xs">{msg.message_type}</small>
+                    <p className="text-sm text-white">{msg.content}</p>
+                    <small className="text-gray-500 text-xs">{msg.message_type}</small>
                   </div>
                 ))
               )}
@@ -459,15 +459,15 @@ const MediationRoom = () => {
         {/* Sidebar */}
         <div className="lg:col-span-1">
           <Card>
-            <div className="flex border-b mb-4">
+            <div className="flex border-b border-gray-600 mb-4">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex-1 py-2 px-4 text-center text-sm font-medium ${
                     activeTab === tab.id
-                      ? 'border-b-2 border-blue-500 text-blue-600'
-                      : 'text-gray-500 hover:text-gray-700'
+                      ? 'border-b-2 border-blue-400 text-blue-400'
+                      : 'text-gray-400 hover:text-gray-300'
                   }`}
                 >
                   {tab.label}
@@ -483,12 +483,12 @@ const MediationRoom = () => {
                     const participant = participants.find(p => p.user_id === ctx.user_id);
                     const party = participant?.role_in_case === 'initiator' ? 'Party A' : 'Party B';
                     return (
-                      <div key={ctx.id} className="mb-4 p-3 bg-gray-50 rounded">
-                        <h4 className="font-medium">{party}</h4>
-                        <p><strong>Background:</strong> {ctx.background_text || 'Not provided'}</p>
-                        <p><strong>Goals:</strong> {ctx.goals_text || 'Not provided'}</p>
-                        <p><strong>Acceptable Outcome:</strong> {ctx.acceptable_outcome_text || 'Not provided'}</p>
-                        <p><strong>Constraints:</strong> {ctx.constraints_text || 'Not provided'}</p>
+                      <div key={ctx.id} className="mb-4 p-3 bg-gray-800 rounded">
+                        <h4 className="font-medium text-white">{party}</h4>
+                        <p className="text-gray-300"><strong>Background:</strong> {ctx.background_text || 'Not provided'}</p>
+                        <p className="text-gray-300"><strong>Goals:</strong> {ctx.goals_text || 'Not provided'}</p>
+                        <p className="text-gray-300"><strong>Acceptable Outcome:</strong> {ctx.acceptable_outcome_text || 'Not provided'}</p>
+                        <p className="text-gray-300"><strong>Constraints:</strong> {ctx.constraints_text || 'Not provided'}</p>
                       </div>
                     );
                   })}
@@ -510,7 +510,7 @@ const MediationRoom = () => {
                       <textarea
                         value={draftText}
                         onChange={(e) => setDraftText(e.target.value)}
-                        className="w-full h-64 p-2 border border-gray-300 rounded"
+                        className="w-full h-64 p-2 border border-gray-600 rounded bg-gray-800 text-white"
                         placeholder="Draft agreement text..."
                       />
                       <div className="flex gap-2 mt-2">
@@ -530,10 +530,10 @@ const MediationRoom = () => {
                     {participants.map(p => {
                       const displayName = p.profiles.full_name || p.profiles.email || 'Unknown';
                       return (
-                        <div key={p.id} className="flex justify-between items-center p-2 border-b border-gray-200">
-                          <span>{displayName} ({p.role_in_case === 'initiator' ? 'Party A' : 'Party B'})</span>
+                        <div key={p.id} className="flex justify-between items-center p-2 border-b border-gray-600">
+                          <span className="text-white">{displayName} ({p.role_in_case === 'initiator' ? 'Party A' : 'Party B'})</span>
                           {p.has_signed_agreement ? (
-                            <span className="text-green-600">Signed at {new Date(p.signed_at).toLocaleString()}</span>
+                            <span className="text-green-400">Signed at {new Date(p.signed_at).toLocaleString()}</span>
                           ) : (
                             <Button onClick={() => setSigningParticipant(p.id)} size="sm">Sign / Acknowledge</Button>
                           )}
@@ -542,10 +542,10 @@ const MediationRoom = () => {
                     })}
                   </div>
                   {signingParticipant && (
-                    <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
-                      <p className="text-sm mb-2">Please enter your full name to confirm signing:</p>
+                    <div className="mt-4 p-3 bg-yellow-900 border border-yellow-700 rounded">
+                      <p className="text-sm mb-2 text-white">Please enter your full name to confirm signing:</p>
                       {signingError && (
-                        <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-800">
+                        <div className="mb-2 p-2 bg-red-900 border border-red-700 rounded text-sm text-red-200">
                           {signingError}
                         </div>
                       )}

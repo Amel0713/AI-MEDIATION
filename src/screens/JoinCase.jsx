@@ -100,7 +100,7 @@ const JoinCase = () => {
         <h1 className="text-3xl font-bold mb-4 text-center bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
           Join Mediation Case
         </h1>
-        <p className="mb-8 text-neutral-600 text-center text-lg">Case: <span className="font-semibold">{caseData.title}</span></p>
+        <p className="mb-8 text-gray-300 text-center text-lg">Case: <span className="font-semibold">{caseData.title}</span></p>
         <form onSubmit={handleSubmit} className="space-y-6">
            <Textarea
              label="Background"
@@ -137,13 +137,13 @@ const JoinCase = () => {
              style={{ animationDelay: '0.3s' }}
            />
           <div className="animate-slide-up" style={{ animationDelay: '0.4s' }}>
-            <label className="block text-sm font-semibold text-neutral-700 mb-2">
+            <label className="block text-sm font-semibold text-white mb-2">
               Sensitivity Level
             </label>
             <select
               value={contextData.sensitivityLevel}
               onChange={(e) => handleInputChange('sensitivityLevel', e.target.value)}
-              className="w-full px-4 py-3 border-2 border-neutral-300 rounded-xl bg-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:bg-neutral-50"
+              className="w-full px-4 py-3 border-2 border-gray-600 rounded-xl bg-gray-800 text-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:bg-gray-700"
               required
             >
               <option value="low">Low</option>
