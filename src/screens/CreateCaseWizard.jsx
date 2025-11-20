@@ -23,6 +23,7 @@ const CreateCaseWizard = () => {
   });
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [uploadErrors, setUploadErrors] = useState([]);
   const navigate = useNavigate();
   const { createDraftCase, generateInviteToken, insertContext, activateCase, uploadFile } = useCase();
 
@@ -32,7 +33,23 @@ const CreateCaseWizard = () => {
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
-    setSelectedFiles(prev => [...prev, ...files]);
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'text/plain'];
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    const errors = [];
+    const validFiles = [];
+
+    files.forEach(file => {
+      if (file.size > maxSize) {
+        errors.push(`${file.name}: File size exceeds 10MB limit.`);
+      } else if (!allowedTypes.includes(file.type)) {
+        errors.push(`${file.name}: Invalid file type. Only PDF, JPG, PNG, and TXT files are allowed.`);
+      } else {
+        validFiles.push(file);
+      }
+    });
+
+    setUploadErrors(errors);
+    setSelectedFiles(prev => [...prev, ...validFiles]);
   };
 
   const removeFile = (index) => {
@@ -232,7 +249,7 @@ const CreateCaseWizard = () => {
               onChange={handleFileSelect}
               className="hidden"
               id="file-upload"
-              accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+              accept=".pdf,.txt,.jpg,.jpeg,.png"
             />
             <label
               htmlFor="file-upload"
@@ -263,6 +280,13 @@ const CreateCaseWizard = () => {
             </div>
           )}
         </div>
+        {uploadErrors.length > 0 && (
+          <div className="text-red-600 text-sm space-y-1">
+            {uploadErrors.map((error, i) => (
+              <p key={i}>{error}</p>
+            ))}
+          </div>
+        )}
       </div>
       <div className="flex space-x-4 pt-4 animate-slide-up" style={{ animationDelay: '0.6s' }}>
         <Button type="submit" disabled={loading} lift>

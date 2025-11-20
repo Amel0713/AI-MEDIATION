@@ -25,6 +25,13 @@ const MediationRoom = () => {
   const [loading, setLoading] = useState(true); // Loading state
   const [signingParticipant, setSigningParticipant] = useState(null); // Participant being signed
   const [signingName, setSigningName] = useState(''); // Name entered for signing
+  const [errorMessage, setErrorMessage] = useState(''); // General error message
+  const [signingError, setSigningError] = useState(''); // Signing error message
+  const [loadingSummarize, setLoadingSummarize] = useState(false); // Loading for summarize
+  const [loadingSuggest, setLoadingSuggest] = useState(false); // Loading for suggest compromises
+  const [loadingRephrase, setLoadingRephrase] = useState(false); // Loading for rephrase
+  const [loadingGenerate, setLoadingGenerate] = useState(false); // Loading for generate draft
+  const [loadingImprove, setLoadingImprove] = useState(false); // Loading for improve clarity
 
   // Fetch all case-related data from Supabase
   const fetchData = async () => {
@@ -196,83 +203,131 @@ const MediationRoom = () => {
   };
 
   const handleSummarize = async () => {
-    const caseMeta = { title: caseData.title, type: caseData.type };
-    const partyContexts = getPartyContexts();
-    const recentMessages = messages.slice(-50).map(msg => ({
-      sender: getSenderName(msg),
-      content: msg.content
-    }));
-    const summary = await summarizeSituation(caseMeta, partyContexts, recentMessages);
-    await supabase.from('cases').update({ ai_summary: summary }).eq('id', caseId);
-    await supabase.from('messages').insert({
-      case_id: caseId,
-      sender_user_id: null,
-      sender_type: 'ai',
-      content: `AI Summary: ${summary}`,
-      message_type: 'ai_suggestion',
-    });
+    setLoadingSummarize(true);
+    setErrorMessage('');
+    try {
+      const caseMeta = { title: caseData.title, type: caseData.type };
+      const partyContexts = getPartyContexts();
+      const recentMessages = messages.slice(-50).map(msg => ({
+        sender: getSenderName(msg),
+        content: msg.content
+      }));
+      const summary = await summarizeSituation(caseMeta, partyContexts, recentMessages);
+      await supabase.from('cases').update({ ai_summary: summary }).eq('id', caseId);
+      await supabase.from('messages').insert({
+        case_id: caseId,
+        sender_user_id: null,
+        sender_type: 'ai',
+        content: `AI Summary: ${summary}`,
+        message_type: 'ai_suggestion',
+      });
+    } catch (error) {
+      console.error('Error in handleSummarize:', error);
+      setErrorMessage(error.message || 'Failed to generate AI summary. Please try again.');
+    } finally {
+      setLoadingSummarize(false);
+    }
   };
 
   const handleSuggestCompromises = async () => {
-    const caseMeta = { title: caseData.title, type: caseData.type };
-    const partyContexts = getPartyContexts();
-    const recentMessages = messages.slice(-50).map(msg => ({
-      sender: getSenderName(msg),
-      content: msg.content
-    }));
-    const suggestions = await suggestCompromises(caseMeta, partyContexts, recentMessages, agreement?.draft_text);
-    await supabase.from('messages').insert({
-      case_id: caseId,
-      sender_user_id: null,
-      sender_type: 'ai',
-      content: `AI Suggested Compromises: ${suggestions}`,
-      message_type: 'ai_suggestion',
-    });
+    setLoadingSuggest(true);
+    setErrorMessage('');
+    try {
+      const caseMeta = { title: caseData.title, type: caseData.type };
+      const partyContexts = getPartyContexts();
+      const recentMessages = messages.slice(-50).map(msg => ({
+        sender: getSenderName(msg),
+        content: msg.content
+      }));
+      const suggestions = await suggestCompromises(caseMeta, partyContexts, recentMessages, agreement?.draft_text);
+      await supabase.from('messages').insert({
+        case_id: caseId,
+        sender_user_id: null,
+        sender_type: 'ai',
+        content: `AI Suggested Compromises: ${suggestions}`,
+        message_type: 'ai_suggestion',
+      });
+    } catch (error) {
+      console.error('Error in handleSuggestCompromises:', error);
+      setErrorMessage(error.message || 'Failed to generate AI compromise suggestions. Please try again.');
+    } finally {
+      setLoadingSuggest(false);
+    }
   };
 
   const handleRephrase = async () => {
-    const lastUserMessage = messages.filter(m => m.sender_type === 'user').slice(-1)[0]?.content;
-    if (!lastUserMessage) return;
-    const rephrased = await rephraseMessage(lastUserMessage);
-    await supabase.from('messages').insert({
-      case_id: caseId,
-      sender_user_id: null,
-      sender_type: 'ai',
-      content: `Rephrased calmly: ${rephrased}`,
-      message_type: 'ai_suggestion',
-    });
+    setLoadingRephrase(true);
+    setErrorMessage('');
+    try {
+      const lastUserMessage = messages.filter(m => m.sender_type === 'user').slice(-1)[0]?.content;
+      if (!lastUserMessage) {
+        setErrorMessage('No user message found to rephrase.');
+        return;
+      }
+      const rephrased = await rephraseMessage(lastUserMessage);
+      await supabase.from('messages').insert({
+        case_id: caseId,
+        sender_user_id: null,
+        sender_type: 'ai',
+        content: `Rephrased calmly: ${rephrased}`,
+        message_type: 'ai_suggestion',
+      });
+    } catch (error) {
+      console.error('Error in handleRephrase:', error);
+      setErrorMessage(error.message || 'Failed to rephrase message. Please try again.');
+    } finally {
+      setLoadingRephrase(false);
+    }
   };
 
   const handleGenerateDraft = async () => {
-    const caseMeta = { title: caseData.title, type: caseData.type };
-    const partyContexts = getPartyContexts();
-    const recentMessages = messages.slice(-50).map(msg => ({
-      sender: getSenderName(msg),
-      content: msg.content
-    }));
-    const draft = await generateAgreementDraft(caseMeta, partyContexts, recentMessages);
-    if (agreement) {
-      await supabase.from('agreements').update({ draft_text: draft }).eq('case_id', caseId);
-    } else {
-      await supabase.from('agreements').insert({
+    setLoadingGenerate(true);
+    setErrorMessage('');
+    try {
+      const caseMeta = { title: caseData.title, type: caseData.type };
+      const partyContexts = getPartyContexts();
+      const recentMessages = messages.slice(-50).map(msg => ({
+        sender: getSenderName(msg),
+        content: msg.content
+      }));
+      const draft = await generateAgreementDraft(caseMeta, partyContexts, recentMessages);
+      if (agreement) {
+        await supabase.from('agreements').update({ draft_text: draft }).eq('case_id', caseId);
+      } else {
+        await supabase.from('agreements').insert({
+          case_id: caseId,
+          draft_text: draft,
+          status: 'draft',
+        });
+      }
+      await supabase.from('messages').insert({
         case_id: caseId,
-        draft_text: draft,
-        status: 'draft',
+        sender_user_id: null,
+        sender_type: 'ai',
+        content: `AI Draft Agreement: ${draft}`,
+        message_type: 'ai_suggestion',
       });
+    } catch (error) {
+      console.error('Error in handleGenerateDraft:', error);
+      setErrorMessage(error.message || 'Failed to generate agreement draft. Please try again.');
+    } finally {
+      setLoadingGenerate(false);
     }
-    await supabase.from('messages').insert({
-      case_id: caseId,
-      sender_user_id: null,
-      sender_type: 'ai',
-      content: `AI Draft Agreement: ${draft}`,
-      message_type: 'ai_suggestion',
-    });
   };
 
   const handleImproveClarity = async () => {
-    const improved = await improveAgreementClarity(draftText);
-    await supabase.from('agreements').update({ draft_text: improved }).eq('case_id', caseId);
-    setDraftText(improved);
+    setLoadingImprove(true);
+    setErrorMessage('');
+    try {
+      const improved = await improveAgreementClarity(draftText);
+      await supabase.from('agreements').update({ draft_text: improved }).eq('case_id', caseId);
+      setDraftText(improved);
+    } catch (error) {
+      console.error('Error in handleImproveClarity:', error);
+      setErrorMessage(error.message || 'Failed to improve agreement clarity. Please try again.');
+    } finally {
+      setLoadingImprove(false);
+    }
   };
 
   const handleFinalize = async () => {
@@ -283,17 +338,23 @@ const MediationRoom = () => {
     const participant = participants.find(p => p.id === signingParticipant);
     const fullName = participant?.profiles?.full_name || participant?.profiles?.email || '';
     if (signingName === fullName) {
-      await supabase.from('case_participants').update({ has_signed_agreement: true, signed_at: new Date().toISOString() }).eq('id', signingParticipant);
-      // Check if all signed
-      const { data: updatedParticipants } = await supabase.from('case_participants').select('has_signed_agreement').eq('case_id', caseId);
-      const allSigned = updatedParticipants.every(p => p.has_signed_agreement);
-      if (allSigned) {
-        await supabase.from('cases').update({ status: 'resolved' }).eq('id', caseId);
+      try {
+        await supabase.from('case_participants').update({ has_signed_agreement: true, signed_at: new Date().toISOString() }).eq('id', signingParticipant);
+        // Check if all signed
+        const { data: updatedParticipants } = await supabase.from('case_participants').select('has_signed_agreement').eq('case_id', caseId);
+        const allSigned = updatedParticipants.every(p => p.has_signed_agreement);
+        if (allSigned) {
+          await supabase.from('cases').update({ status: 'resolved' }).eq('id', caseId);
+        }
+        setSigningParticipant(null);
+        setSigningName('');
+        setSigningError('');
+      } catch (error) {
+        console.error('Error signing agreement:', error);
+        setSigningError('Failed to sign agreement. Please try again.');
       }
-      setSigningParticipant(null);
-      setSigningName('');
     } else {
-      alert("Name does not match. Please try again.");
+      setSigningError("Name does not match. Please try again.");
     }
   };
 
@@ -315,6 +376,35 @@ const MediationRoom = () => {
           Back to Dashboard
         </Button>
       </div>
+
+      {errorMessage && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-800">{errorMessage}</p>
+            </div>
+            <div className="ml-auto pl-3">
+              <div className="-mx-1.5 -my-1.5">
+                <button
+                  type="button"
+                  className="inline-flex bg-red-50 rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-50 focus:ring-red-600"
+                  onClick={() => setErrorMessage('')}
+                >
+                  <span className="sr-only">Dismiss</span>
+                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chat Section */}
@@ -350,10 +440,18 @@ const MediationRoom = () => {
               <Button onClick={handleSendMessage}>Send</Button>
             </div>
             <div className="flex flex-wrap gap-2 mt-2">
-              <Button onClick={handleSummarize} variant="outline" size="sm">Ask AI to summarize the situation</Button>
-              <Button onClick={handleSuggestCompromises} variant="outline" size="sm">Ask AI for suggested compromise options</Button>
-              <Button onClick={handleRephrase} variant="outline" size="sm">Ask AI to rephrase my last message more calmly</Button>
-              <Button onClick={handleGenerateDraft} variant="outline" size="sm">Generate / update draft agreement</Button>
+              <Button onClick={handleSummarize} variant="outline" size="sm" disabled={loadingSummarize}>
+                {loadingSummarize ? 'Generating Summary...' : 'Ask AI to summarize the situation'}
+              </Button>
+              <Button onClick={handleSuggestCompromises} variant="outline" size="sm" disabled={loadingSuggest}>
+                {loadingSuggest ? 'Generating Suggestions...' : 'Ask AI for suggested compromise options'}
+              </Button>
+              <Button onClick={handleRephrase} variant="outline" size="sm" disabled={loadingRephrase}>
+                {loadingRephrase ? 'Rephrasing...' : 'Ask AI to rephrase my last message more calmly'}
+              </Button>
+              <Button onClick={handleGenerateDraft} variant="outline" size="sm" disabled={loadingGenerate}>
+                {loadingGenerate ? 'Generating Draft...' : 'Generate / update draft agreement'}
+              </Button>
             </div>
           </Card>
         </div>
@@ -416,7 +514,9 @@ const MediationRoom = () => {
                         placeholder="Draft agreement text..."
                       />
                       <div className="flex gap-2 mt-2">
-                        <Button onClick={handleImproveClarity} variant="outline" size="sm">Ask AI to improve clarity</Button>
+                        <Button onClick={handleImproveClarity} variant="outline" size="sm" disabled={loadingImprove}>
+                          {loadingImprove ? 'Improving Clarity...' : 'Ask AI to improve clarity'}
+                        </Button>
                         <Button onClick={handleFinalize} size="sm">Finalize agreement</Button>
                       </div>
                     </div>
@@ -444,6 +544,11 @@ const MediationRoom = () => {
                   {signingParticipant && (
                     <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
                       <p className="text-sm mb-2">Please enter your full name to confirm signing:</p>
+                      {signingError && (
+                        <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-800">
+                          {signingError}
+                        </div>
+                      )}
                       <div className="flex space-x-2">
                         <Input
                           value={signingName}
@@ -452,7 +557,7 @@ const MediationRoom = () => {
                           className="flex-1"
                         />
                         <Button onClick={handleSign} size="sm">Confirm</Button>
-                        <Button onClick={() => { setSigningParticipant(null); setSigningName(''); }} variant="outline" size="sm">Cancel</Button>
+                        <Button onClick={() => { setSigningParticipant(null); setSigningName(''); setSigningError(''); }} variant="outline" size="sm">Cancel</Button>
                       </div>
                     </div>
                   )}
