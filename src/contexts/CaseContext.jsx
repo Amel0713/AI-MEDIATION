@@ -89,7 +89,7 @@ export const CaseProvider = ({ children }) => {
   };
 
   const generateInviteToken = async (caseId, inviteEmail) => {
-    const inviteToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const inviteToken = crypto.randomUUID();
 
     const { error } = await supabase
       .from('cases')

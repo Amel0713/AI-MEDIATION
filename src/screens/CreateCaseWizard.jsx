@@ -123,13 +123,13 @@ const CreateCaseWizard = () => {
         style={{ animationDelay: '0.1s' }}
       />
       <div className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
-        <label className="block text-sm font-semibold text-neutral-700 mb-2">
+        <label className="block text-sm font-semibold text-white mb-2">
           Case Type
         </label>
         <select
           value={caseData.type}
           onChange={(e) => handleInputChange('type', e.target.value)}
-          className="w-full px-4 py-3 border-2 border-neutral-300 rounded-xl bg-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:bg-neutral-50"
+          className="w-full px-4 py-3 border-2 border-gray-600 rounded-xl bg-gray-800 text-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:bg-gray-700"
           required
         >
           <option value="personal">Personal</option>
@@ -206,13 +206,13 @@ const CreateCaseWizard = () => {
         style={{ animationDelay: '0.3s' }}
       />
       <div className="animate-slide-up" style={{ animationDelay: '0.4s' }}>
-        <label className="block text-sm font-semibold text-neutral-700 mb-2">
+        <label className="block text-sm font-semibold text-white mb-2">
           Sensitivity Level
         </label>
         <select
           value={caseData.sensitivityLevel}
           onChange={(e) => handleInputChange('sensitivityLevel', e.target.value)}
-          className="w-full px-4 py-3 border-2 border-neutral-300 rounded-xl bg-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:bg-neutral-50"
+          className="w-full px-4 py-3 border-2 border-gray-600 rounded-xl bg-gray-800 text-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:bg-gray-700"
           required
         >
           <option value="low">Low</option>
@@ -221,7 +221,7 @@ const CreateCaseWizard = () => {
         </select>
       </div>
       <div className="animate-slide-up" style={{ animationDelay: '0.5s' }}>
-        <label className="block text-sm font-semibold text-neutral-700 mb-2">
+        <label className="block text-sm font-semibold text-white mb-2">
           Upload Documents (optional)
         </label>
         <div className="space-y-3">
@@ -236,25 +236,25 @@ const CreateCaseWizard = () => {
             />
             <label
               htmlFor="file-upload"
-              className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-neutral-300 rounded-xl bg-neutral-50 hover:bg-neutral-100 transition-colors cursor-pointer"
+              className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-gray-600 rounded-xl bg-gray-800 hover:bg-gray-700 transition-colors cursor-pointer"
             >
-              <Upload className="h-5 w-5 mr-2 text-neutral-500" />
-              <span className="text-neutral-600">Click to upload files</span>
+              <Upload className="h-5 w-5 mr-2 text-gray-400" />
+              <span className="text-gray-300">Click to upload files</span>
             </label>
           </div>
           {selectedFiles.length > 0 && (
             <div className="space-y-2">
               {selectedFiles.map((file, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
                   <div className="flex items-center space-x-2">
-                    <FileText className="h-4 w-4 text-neutral-500" />
-                    <span className="text-sm text-neutral-700">{file.name}</span>
-                    <span className="text-xs text-neutral-500">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                    <FileText className="h-4 w-4 text-gray-400" />
+                    <span className="text-sm text-white">{file.name}</span>
+                    <span className="text-xs text-gray-500">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => removeFile(index)}
-                    className="text-neutral-400 hover:text-red-500 transition-colors"
+                    className="text-gray-400 hover:text-red-500 transition-colors"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -279,14 +279,14 @@ const CreateCaseWizard = () => {
     if (!caseData.inviteToken) return null;
     const inviteUrl = `${window.location.origin}/join/${caseData.inviteToken}`;
     return (
-      <div className="mt-6 p-6 bg-neutral-50 rounded-xl border border-neutral-200 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-        <p className="text-sm font-semibold text-neutral-700 mb-3">Invite Link Generated:</p>
+      <div className="mt-6 p-6 bg-gray-800 rounded-xl border border-gray-700 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+        <p className="text-sm font-semibold text-white mb-3">Invite Link Generated:</p>
         <div className="flex items-center space-x-3">
           <input
             type="text"
             value={inviteUrl}
             readOnly
-            className="flex-1 px-4 py-3 border-2 border-neutral-300 rounded-xl bg-white shadow-sm font-mono text-sm"
+            className="flex-1 px-4 py-3 border-2 border-gray-600 rounded-xl bg-gray-900 text-white shadow-sm font-mono text-sm"
           />
           <Button
             type="button"
@@ -306,29 +306,29 @@ const CreateCaseWizard = () => {
     <div className="max-w-2xl mx-auto animate-fade-in">
       <Card hover>
         <div className="text-center mb-8 animate-slide-up">
-          <h1 className="text-4xl font-bold text-neutral-900 mb-4 bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold text-white mb-4 bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
             Let's Create Your Mediation Case
           </h1>
-          <p className="text-neutral-600 text-lg">We'll guide you through the process step by step</p>
+          <p className="text-gray-300 text-lg">We'll guide you through the process step by step</p>
         </div>
         <div className="mb-12 animate-scale-in" style={{ animationDelay: '0.2s' }}>
           <div className="flex items-center space-x-6">
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${step >= 1 ? 'bg-primary-500 text-white shadow-lg' : 'bg-neutral-200 text-neutral-600'}`}>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${step >= 1 ? 'bg-primary-500 text-white shadow-lg' : 'bg-gray-700 text-gray-400'}`}>
               <FileText className="h-6 w-6" />
             </div>
-            <div className={`flex-1 h-2 rounded-full transition-all duration-300 ${step >= 2 ? 'bg-primary-500' : 'bg-neutral-200'}`}></div>
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${step >= 2 ? 'bg-primary-500 text-white shadow-lg' : 'bg-neutral-200 text-neutral-600'}`}>
+            <div className={`flex-1 h-2 rounded-full transition-all duration-300 ${step >= 2 ? 'bg-primary-500' : 'bg-gray-700'}`}></div>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${step >= 2 ? 'bg-primary-500 text-white shadow-lg' : 'bg-gray-700 text-gray-400'}`}>
               <Users className="h-6 w-6" />
             </div>
-            <div className={`flex-1 h-2 rounded-full transition-all duration-300 ${step >= 3 ? 'bg-primary-500' : 'bg-neutral-200'}`}></div>
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${step >= 3 ? 'bg-primary-500 text-white shadow-lg' : 'bg-neutral-200 text-neutral-600'}`}>
+            <div className={`flex-1 h-2 rounded-full transition-all duration-300 ${step >= 3 ? 'bg-primary-500' : 'bg-gray-700'}`}></div>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${step >= 3 ? 'bg-primary-500 text-white shadow-lg' : 'bg-gray-700 text-gray-400'}`}>
               <Settings className="h-6 w-6" />
             </div>
           </div>
-          <div className="flex justify-between mt-4 text-sm font-medium text-neutral-600">
-            <span className={step >= 1 ? 'text-primary-600' : ''}>Case Details</span>
-            <span className={step >= 2 ? 'text-primary-600' : ''}>Invite Others</span>
-            <span className={step >= 3 ? 'text-primary-600' : ''}>Add Context</span>
+          <div className="flex justify-between mt-4 text-sm font-medium text-gray-400">
+            <span className={step >= 1 ? 'text-primary-400' : ''}>Case Details</span>
+            <span className={step >= 2 ? 'text-primary-400' : ''}>Invite Others</span>
+            <span className={step >= 3 ? 'text-primary-400' : ''}>Add Context</span>
           </div>
         </div>
         {step === 1 && renderStep1()}

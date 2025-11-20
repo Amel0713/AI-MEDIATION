@@ -13,7 +13,7 @@ const Textarea = ({
   return (
     <div className="mb-5">
       {label && (
-        <label className="block text-sm font-semibold text-neutral-700 mb-2">
+        <label className="block text-sm font-semibold text-white mb-2">
           {label}
         </label>
       )}
@@ -23,7 +23,7 @@ const Textarea = ({
         placeholder={placeholder}
         required={required}
         rows={rows}
-        className={`w-full px-4 py-3 border-2 border-neutral-300 rounded-xl bg-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:bg-neutral-50 resize-none ${className}`}
+        className={`w-full px-4 py-3 border-2 border-gray-600 rounded-xl bg-gray-800 text-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:bg-gray-700 resize-none ${className}`}
         {...props}
       />
     </div>
