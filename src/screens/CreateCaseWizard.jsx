@@ -5,7 +5,7 @@ import Card from '../components/Card';
 import Input from '../components/Input';
 import Textarea from '../components/Textarea';
 import Button from '../components/Button';
-import { FileText, Users, Settings, Copy, ArrowLeft, ArrowRight } from 'lucide-react';
+import { FileText, Users, Settings, Copy, ArrowLeft, ArrowRight, Upload, X } from 'lucide-react';
 
 const CreateCaseWizard = () => {
   const [step, setStep] = useState(1);
@@ -22,11 +22,21 @@ const CreateCaseWizard = () => {
     sensitivityLevel: 'normal',
   });
   const [loading, setLoading] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const navigate = useNavigate();
-  const { createDraftCase, generateInviteToken, insertContext, activateCase } = useCase();
+  const { createDraftCase, generateInviteToken, insertContext, activateCase, uploadFile } = useCase();
 
   const handleInputChange = (field, value) => {
     setCaseData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files);
+    setSelectedFiles(prev => [...prev, ...files]);
+  };
+
+  const removeFile = (index) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleStep1Submit = async (e) => {
@@ -74,6 +84,14 @@ const CreateCaseWizard = () => {
         constraints_text: caseData.constraintsText,
         sensitivity_level: caseData.sensitivityLevel,
       });
+
+      // Upload selected files
+      if (selectedFiles.length > 0) {
+        for (const file of selectedFiles) {
+          await uploadFile(caseData.id, file);
+        }
+      }
+
       await activateCase(caseData.id);
       navigate(`/mediation/${caseData.id}`);
     } catch (error) {
@@ -202,7 +220,51 @@ const CreateCaseWizard = () => {
           <option value="high">High</option>
         </select>
       </div>
-      <div className="flex space-x-4 pt-4 animate-slide-up" style={{ animationDelay: '0.5s' }}>
+      <div className="animate-slide-up" style={{ animationDelay: '0.5s' }}>
+        <label className="block text-sm font-semibold text-neutral-700 mb-2">
+          Upload Documents (optional)
+        </label>
+        <div className="space-y-3">
+          <div className="relative">
+            <input
+              type="file"
+              multiple
+              onChange={handleFileSelect}
+              className="hidden"
+              id="file-upload"
+              accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+            />
+            <label
+              htmlFor="file-upload"
+              className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-neutral-300 rounded-xl bg-neutral-50 hover:bg-neutral-100 transition-colors cursor-pointer"
+            >
+              <Upload className="h-5 w-5 mr-2 text-neutral-500" />
+              <span className="text-neutral-600">Click to upload files</span>
+            </label>
+          </div>
+          {selectedFiles.length > 0 && (
+            <div className="space-y-2">
+              {selectedFiles.map((file, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <FileText className="h-4 w-4 text-neutral-500" />
+                    <span className="text-sm text-neutral-700">{file.name}</span>
+                    <span className="text-xs text-neutral-500">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeFile(index)}
+                    className="text-neutral-400 hover:text-red-500 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="flex space-x-4 pt-4 animate-slide-up" style={{ animationDelay: '0.6s' }}>
         <Button type="submit" disabled={loading} lift>
           {loading ? 'Finalizing...' : 'Create Case'}
         </Button>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCase } from '../contexts/CaseContext';
 import Card from '../components/Card';
@@ -8,6 +8,20 @@ import { Plus, Users, FolderOpen, ArrowRight, RefreshCw } from 'lucide-react';
 const Dashboard = () => {
   const navigate = useNavigate();
   const { cases, loading, error, fetchCases } = useCase();
+  const [timeoutError, setTimeoutError] = useState(false);
+
+  console.log('Dashboard render - cases:', cases, 'loading:', loading, 'error:', error, 'timeoutError:', timeoutError);
+
+  useEffect(() => {
+    if (loading) {
+      const timer = setTimeout(() => {
+        setTimeoutError(true);
+      }, 10000);
+      return () => clearTimeout(timer);
+    } else {
+      setTimeoutError(false);
+    }
+  }, [loading]);
 
   return (
     <div className="space-y-12 animate-fade-in">
@@ -63,17 +77,19 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {loading && (
+      {loading && !timeoutError && (
         <div className="text-center animate-fade-in">
           <p className="text-xl text-neutral-600">Loading your cases...</p>
         </div>
       )}
 
-      {error && (
+      {(error || timeoutError) && (
         <Card className="animate-fade-in">
           <div className="text-center">
-            <p className="text-lg text-red-600 mb-4">Failed to load cases: {error}</p>
-            <Button onClick={fetchCases} variant="outline" className="flex items-center gap-2">
+            <p className="text-lg text-red-600 mb-4">
+              {timeoutError ? 'Loading timed out. Please try again.' : `Failed to load cases: ${error}`}
+            </p>
+            <Button onClick={() => { setTimeoutError(false); fetchCases(); }} variant="outline" className="flex items-center gap-2">
               <RefreshCw className="h-5 w-5" />
               Retry
             </Button>

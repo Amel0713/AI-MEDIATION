@@ -84,6 +84,7 @@ export const AuthProvider = ({ children }) => {
     // Listen for auth state changes (login, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        console.log('Auth state change:', _event, 'user:', session?.user?.id);
         setUser(session?.user ?? null);
         if (session?.user) {
           await ensureProfileExists(session.user);
@@ -108,6 +109,7 @@ export const AuthProvider = ({ children }) => {
 
   // Sign up with email, password, and full name
   const signUp = async (email, password, fullName) => {
+    const redirectTo = import.meta.env.VITE_SITE_URL || 'http://localhost:5173';
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -115,6 +117,7 @@ export const AuthProvider = ({ children }) => {
         data: {
           full_name: fullName,
         },
+        redirectTo,
       },
     });
     if (error) {
