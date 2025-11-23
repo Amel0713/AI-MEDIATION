@@ -1,4 +1,6 @@
+// @ts-ignore
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
+// @ts-ignore
 import OpenAI from 'https://esm.sh/openai'
 
 export const SYSTEM_PROMPT = "You are an impartial, neutral mediator facilitating a conversation between two parties. Your role is to help them reach a fair agreement by summarizing discussions, suggesting compromises, rephrasing messages calmly, and drafting agreements. Always remain neutral and professional."

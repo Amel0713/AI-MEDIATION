@@ -1,5 +1,5 @@
 /* eslint-disable no-console, react-hooks/set-state-in-effect */
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCase } from '../contexts/CaseContext';
 import Card from '../components/Card';

@@ -1,10 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, curly, no-console */
 import { supabase } from './supabase';
 
-// System prompt that defines the AI mediator's role and behavior
-const SYSTEM_PROMPT = "You are an impartial, neutral mediator facilitating a conversation between two parties. Your role is to help them reach a fair agreement by summarizing discussions, suggesting compromises, rephrasing messages calmly, and drafting agreements. Always remain neutral and professional.";
-
-
 // Generate a neutral summary of the current mediation situation
 export async function summarizeSituation(caseMeta: any, partyContexts: any, recentMessages: any): Promise<string> {
   try {

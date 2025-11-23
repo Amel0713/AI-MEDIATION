@@ -1,3 +1,4 @@
+-- sql-lint-disable
 -- language: pgsql
 -- Create rate_limits table for persistent rate limiting
 CREATE TABLE rate_limits (
