@@ -1,3 +1,4 @@
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CaseProvider } from './contexts/CaseContext';
@@ -9,8 +10,12 @@ import JoinCase from './screens/JoinCase';
 import JoinCasePrompt from './screens/JoinCasePrompt';
 import MediationRoom from './screens/MediationRoom';
 
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
 // Protected route component that requires authentication
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
 
   // Show loading spinner while checking authentication status

@@ -7,16 +7,16 @@ import Button from '../components/Button';
 import { LogIn, UserPlus, Mail, Lock, Chrome, Scale } from 'lucide-react';
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [isLogin, setIsLogin] = useState<boolean>(true);
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [fullName, setFullName] = useState<string>('');
+  const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
   const { signIn, signUp, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -29,7 +29,7 @@ const Auth = () => {
       }
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message);
+      setError((err as Error).message);
     } finally {
       setLoading(false);
     }
@@ -41,7 +41,7 @@ const Auth = () => {
       await signInWithGoogle();
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message);
+      setError((err as Error).message);
     }
   };
 

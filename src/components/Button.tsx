@@ -1,5 +1,17 @@
 import React from 'react';
 
+interface ButtonProps {
+  children: React.ReactNode;
+  onClick?: () => void;
+  type?: 'button' | 'submit' | 'reset';
+  variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  disabled?: boolean;
+  className?: string;
+  lift?: boolean;
+  [key: string]: any;
+}
+
 const Button = ({
   children,
   onClick,
@@ -10,7 +22,7 @@ const Button = ({
   className = '',
   lift = false,
   ...props
-}) => {
+}: ButtonProps) => {
   const baseClasses = 'inline-flex items-center justify-center font-semibold rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all duration-200';
 
   const variantClasses = {

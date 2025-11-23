@@ -1,5 +1,18 @@
 import React from 'react';
 
+interface InputProps {
+  label?: string;
+  type?: string;
+  placeholder?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  error?: string;
+  required?: boolean;
+  className?: string;
+  icon?: React.ReactNode;
+  [key: string]: any;
+}
+
 const Input = ({
   label,
   type = 'text',
@@ -11,7 +24,7 @@ const Input = ({
   className = '',
   icon,
   ...props
-}) => {
+}: InputProps) => {
   const inputClasses = `w-full px-4 py-3 border-2 rounded-xl bg-gray-800 text-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-700 ${
     error
       ? 'border-red-300 focus:border-red-500 focus:ring-red-500'

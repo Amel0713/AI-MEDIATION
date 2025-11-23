@@ -5,11 +5,11 @@ import Input from '../components/Input';
 import Button from '../components/Button';
 
 const JoinCasePrompt = () => {
-  const [token, setToken] = useState('');
-  const [error, setError] = useState('');
+  const [token, setToken] = useState<string>('');
+  const [error, setError] = useState<string>('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!token.trim()) {
       setError('Please enter a valid invite token');

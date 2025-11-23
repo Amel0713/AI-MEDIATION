@@ -1,12 +1,20 @@
 import React from 'react';
 
+interface CardProps {
+  children: React.ReactNode;
+  className?: string;
+  hover?: boolean;
+  padding?: 'none' | 'small' | 'normal' | 'large';
+  [key: string]: any;
+}
+
 const Card = ({
   children,
   className = '',
   hover = false,
   padding = 'normal',
   ...props
-}) => {
+}: CardProps) => {
   const paddingClasses = {
     none: '',
     small: 'p-4',

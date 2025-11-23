@@ -1,7 +1,17 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { User } from '@supabase/supabase-js';
 import { supabase } from '../services/supabase';
 
-const AuthContext = createContext();
+interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  signIn: (email: string, password: string) => Promise<any>;
+  signUp: (email: string, password: string, fullName: string) => Promise<any>;
+  signInWithGoogle: () => Promise<any>;
+  signOut: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | null>(null);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -12,12 +22,12 @@ export const useAuth = () => {
 };
 
 // Authentication context provider that manages user state and auth operations
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   // Ensure a user profile exists in the database after authentication
-  const ensureProfileExists = async (user) => {
+  const ensureProfileExists = async (user: User) => {
     if (!user) return;
 
     try {
@@ -98,7 +108,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Sign in with email and password
-  const signIn = async (email, password) => {
+  const signIn = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -108,8 +118,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Sign up with email, password, and full name
-  const signUp = async (email, password, fullName) => {
-    const redirectTo = import.meta.env.VITE_SITE_URL || 'http://localhost:5173';
+  const signUp = async (email: string, password: string, fullName: string) => {
+    const redirectTo = (import.meta as any).env.VITE_SITE_URL || 'http://localhost:5173';
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -117,7 +127,7 @@ export const AuthProvider = ({ children }) => {
         data: {
           full_name: fullName,
         },
-        redirectTo,
+        emailRedirectTo: redirectTo,
       },
     });
     if (error) {
