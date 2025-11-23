@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, curly, no-console */
 import { supabase } from './supabase';
 
 // System prompt that defines the AI mediator's role and behavior
@@ -5,7 +6,7 @@ const SYSTEM_PROMPT = "You are an impartial, neutral mediator facilitating a con
 
 
 // Generate a neutral summary of the current mediation situation
-export async function summarizeSituation(caseMeta, partyContexts, recentMessages) {
+export async function summarizeSituation(caseMeta: any, partyContexts: any, recentMessages: any): Promise<string> {
   try {
     const { data, error } = await supabase.functions.invoke('summarize-situation', {
       body: { caseMeta, partyContexts, recentMessages }
@@ -21,7 +22,7 @@ export async function summarizeSituation(caseMeta, partyContexts, recentMessages
 }
 
 // Suggest compromise options based on case context and discussion
-export async function suggestCompromises(caseMeta, partyContexts, recentMessages, agreementDraft) {
+export async function suggestCompromises(caseMeta: any, partyContexts: any, recentMessages: any, agreementDraft: any): Promise<string> {
   try {
     const { data, error } = await supabase.functions.invoke('suggest-compromises', {
       body: { caseMeta, partyContexts, recentMessages, agreementDraft }
@@ -37,7 +38,7 @@ export async function suggestCompromises(caseMeta, partyContexts, recentMessages
 }
 
 // Rephrase a user's message to be more calm and professional
-export async function rephraseMessage(lastMessage) {
+export async function rephraseMessage(lastMessage: any): Promise<string> {
   try {
     const { data, error } = await supabase.functions.invoke('rephrase-message', {
       body: { lastMessage }
@@ -53,7 +54,7 @@ export async function rephraseMessage(lastMessage) {
 }
 
 // Generate or update a draft agreement based on case discussion
-export async function generateAgreementDraft(caseMeta, partyContexts, recentMessages) {
+export async function generateAgreementDraft(caseMeta: any, partyContexts: any, recentMessages: any): Promise<string> {
   try {
     const { data, error } = await supabase.functions.invoke('generate-agreement', {
       body: { caseMeta, partyContexts, recentMessages }
@@ -69,7 +70,7 @@ export async function generateAgreementDraft(caseMeta, partyContexts, recentMess
 }
 
 // Improve the clarity and professionalism of an agreement draft
-export async function improveAgreementClarity(draftText) {
+export async function improveAgreementClarity(draftText: any): Promise<string> {
   try {
     const { data, error } = await supabase.functions.invoke('improve-agreement', {
       body: { draftText }

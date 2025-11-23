@@ -1,11 +1,8 @@
 import React from 'react';
 
-interface CardProps {
-  children: React.ReactNode;
-  className?: string;
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   hover?: boolean;
   padding?: 'none' | 'small' | 'normal' | 'large';
-  [key: string]: any;
 }
 
 const Card = ({

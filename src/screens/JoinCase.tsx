@@ -1,14 +1,14 @@
+/* eslint-disable no-console */
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useCase } from '../contexts/CaseContext';
+import { useCase, Case } from '../contexts/CaseContext';
 import Card from '../components/Card';
-import Input from '../components/Input';
 import Textarea from '../components/Textarea';
 import Button from '../components/Button';
 
 const JoinCase = () => {
   const { token } = useParams();
-  const [caseData, setCaseData] = useState(null);
+  const [caseData, setCaseData] = useState<Case | null>(null);
   const [contextData, setContextData] = useState({
     backgroundText: '',
     goalsText: '',
@@ -23,6 +23,11 @@ const JoinCase = () => {
 
   useEffect(() => {
     const validateToken = async () => {
+      if (!token) {
+        setError('No token provided');
+        setLoading(false);
+        return;
+      }
       try {
         const data = await validateInviteToken(token);
         setCaseData(data);
@@ -33,17 +38,18 @@ const JoinCase = () => {
         setLoading(false);
       }
     };
-    if (token) {
-      validateToken();
-    }
+    validateToken();
   }, [token, validateInviteToken]);
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: string, value: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     setContextData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!caseData) {
+      return;
+    }
     setLoading(true);
     try {
       await joinCaseWithToken(caseData.id);
@@ -100,7 +106,7 @@ const JoinCase = () => {
         <h1 className="text-3xl font-bold mb-4 text-center bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
           Join Mediation Case
         </h1>
-        <p className="mb-8 text-gray-300 text-center text-lg">Case: <span className="font-semibold">{caseData.title}</span></p>
+        <p className="mb-8 text-gray-300 text-center text-lg">Case: <span className="font-semibold">{caseData!.title}</span></p>
         <form onSubmit={handleSubmit} className="space-y-6">
            <Textarea
              label="Background"

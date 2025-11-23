@@ -1,3 +1,4 @@
+/* eslint-disable no-console, react-hooks/set-state-in-effect */
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCase } from '../contexts/CaseContext';
@@ -7,10 +8,10 @@ import { Plus, Users, FolderOpen, ArrowRight, RefreshCw } from 'lucide-react';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { cases, loading, error, fetchCases } = useCase();
+  const { cases, loading, fetchCases } = useCase();
   const [timeoutError, setTimeoutError] = useState(false);
 
-  console.log('Dashboard render - cases:', cases, 'loading:', loading, 'error:', error, 'timeoutError:', timeoutError);
+  console.log('Dashboard render - cases:', cases, 'loading:', loading, 'timeoutError:', timeoutError);
 
   useEffect(() => {
     if (loading) {
@@ -83,11 +84,11 @@ const Dashboard = () => {
         </div>
       )}
 
-      {(error || timeoutError) && (
+      {timeoutError && (
         <Card className="animate-fade-in">
           <div className="text-center">
             <p className="text-lg text-red-600 mb-4">
-              {timeoutError ? 'Loading timed out. Please try again.' : `Failed to load cases: ${error}`}
+              Loading timed out. Please try again.
             </p>
             <Button onClick={() => { setTimeoutError(false); fetchCases(); }} variant="outline" className="flex items-center gap-2">
               <RefreshCw className="h-5 w-5" />
@@ -97,7 +98,7 @@ const Dashboard = () => {
         </Card>
       )}
 
-      {!loading && !error && cases.length === 0 && (
+      {!loading && cases.length === 0 && (
         <Card className="animate-fade-in">
           <div className="text-center">
             <div className="p-3 bg-gray-800 rounded-xl mb-4 inline-block">

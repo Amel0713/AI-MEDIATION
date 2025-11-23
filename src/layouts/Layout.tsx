@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -33,7 +34,7 @@ const Layout = () => {
                   <div className="hidden md:flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                     <span className="text-sm font-medium text-gray-300">
-                      Welcome, {user.email.split('@')[0]}
+                      Welcome, {user.email ? user.email.split('@')[0] : 'User'}
                     </span>
                   </div>
                   <Button

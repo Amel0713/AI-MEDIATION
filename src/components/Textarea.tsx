@@ -1,14 +1,8 @@
 import React from 'react';
 
-interface TextareaProps {
+interface TextareaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> {
   label?: string;
-  value?: string;
   onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  placeholder?: string;
-  required?: boolean;
-  className?: string;
-  rows?: number;
-  [key: string]: any;
 }
 
 const Textarea = ({
@@ -25,7 +19,7 @@ const Textarea = ({
     <div className="mb-5">
       {label && (
         <label className="block text-sm font-semibold text-white mb-2">
-          {label}
+          {label}{required && <span className="text-red-500">*</span>}
         </label>
       )}
       <textarea

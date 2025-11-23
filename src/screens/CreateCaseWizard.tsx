@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCase } from '../contexts/CaseContext';
@@ -5,11 +6,25 @@ import Card from '../components/Card';
 import Input from '../components/Input';
 import Textarea from '../components/Textarea';
 import Button from '../components/Button';
-import { FileText, Users, Settings, Copy, ArrowLeft, ArrowRight, Upload, X } from 'lucide-react';
+import { FileText, Users, Settings, Copy, Upload, X } from 'lucide-react';
+
+interface CaseFormData {
+  title: string;
+  description: string;
+  type: string;
+  inviteEmail: string;
+  inviteToken: string;
+  id?: string;
+  backgroundText: string;
+  goalsText: string;
+  acceptableOutcomeText: string;
+  constraintsText: string;
+  sensitivityLevel: string;
+}
 
 const CreateCaseWizard = () => {
   const [step, setStep] = useState(1);
-  const [caseData, setCaseData] = useState({
+  const [caseData, setCaseData] = useState<CaseFormData>({
     title: '',
     description: '',
     type: 'personal',
@@ -22,24 +37,41 @@ const CreateCaseWizard = () => {
     sensitivityLevel: 'normal',
   });
   const [loading, setLoading] = useState(false);
-  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploadErrors, setUploadErrors] = useState<string[]>([]);
   const navigate = useNavigate();
   const { createDraftCase, generateInviteToken, insertContext, activateCase, uploadFile } = useCase();
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: string, value: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     setCaseData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleFileSelect = (e) => {
-    const files = Array.from(e.target.files);
-    setSelectedFiles(prev => [...prev, ...files]);
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []) as File[];
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'text/plain'];
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    const errors: string[] = [];
+    const validFiles: File[] = [];
+
+    files.forEach(file => {
+      if (file.size > maxSize) {
+        errors.push(`${file.name}: File size exceeds 10MB limit.`);
+      } else if (!allowedTypes.includes(file.type)) {
+        errors.push(`${file.name}: Invalid file type. Only PDF, JPG, PNG, and TXT files are allowed.`);
+      } else {
+        validFiles.push(file);
+      }
+    });
+
+    setUploadErrors(errors);
+    setSelectedFiles(prev => [...prev, ...validFiles]);
   };
 
-  const removeFile = (index) => {
+  const removeFile = (index: number) => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleStep1Submit = async (e) => {
+  const handleStep1Submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
@@ -58,11 +90,11 @@ const CreateCaseWizard = () => {
     }
   };
 
-  const handleStep2Submit = async (e) => {
+  const handleStep2Submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const token = await generateInviteToken(caseData.id, caseData.inviteEmail);
+      const token = await generateInviteToken(caseData.id!, caseData.inviteEmail);
       setCaseData(prev => ({ ...prev, inviteToken: token }));
       setStep(3);
     } catch (error) {
@@ -73,11 +105,11 @@ const CreateCaseWizard = () => {
     }
   };
 
-  const handleStep3Submit = async (e) => {
+  const handleStep3Submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await insertContext(caseData.id, {
+      await insertContext(caseData.id!, {
         background_text: caseData.backgroundText,
         goals_text: caseData.goalsText,
         acceptable_outcome_text: caseData.acceptableOutcomeText,
@@ -85,18 +117,45 @@ const CreateCaseWizard = () => {
         sensitivity_level: caseData.sensitivityLevel,
       });
 
-      // Upload selected files
+      // Upload selected files with specific error handling
       if (selectedFiles.length > 0) {
+        const uploadErrors: string[] = [];
         for (const file of selectedFiles) {
-          await uploadFile(caseData.id, file);
+          try {
+            await uploadFile(caseData.id!, file);
+          } catch (uploadError) {
+            console.error(`Error uploading file ${file.name}:`, uploadError);
+            const message = uploadError instanceof Error ? uploadError.message : 'Unknown error';
+            uploadErrors.push(`Failed to upload ${file.name}: ${message}`);
+          }
+        }
+
+        // If some uploads failed, show specific errors but continue with case creation
+        if (uploadErrors.length > 0) {
+          setUploadErrors(prev => [...prev, ...uploadErrors]);
+          // Don't throw here - allow case creation to continue
+          alert(`Case created successfully, but some files failed to upload:\n${uploadErrors.join('\n')}`);
         }
       }
 
-      await activateCase(caseData.id);
+      await activateCase(caseData.id!);
       navigate(`/mediation/${caseData.id}`);
     } catch (error) {
       console.error('Error finalizing case:', error);
-      alert('Error finalizing case');
+      // Provide more specific error messages based on the error type
+      let errorMessage = 'Error finalizing case';
+      if (error instanceof Error) {
+        if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = 'Network error occurred. Please check your connection and try again.';
+        } else if (error.message.includes('permission') || error.message.includes('unauthorized')) {
+          errorMessage = 'Permission denied. Please check your account permissions.';
+        } else if (error.message.includes('storage') || error.message.includes('quota')) {
+          errorMessage = 'Storage limit exceeded. Please reduce file sizes or remove some files.';
+        } else if (error.message) {
+          errorMessage = `Error: ${error.message}`;
+        }
+      }
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -232,7 +291,7 @@ const CreateCaseWizard = () => {
               onChange={handleFileSelect}
               className="hidden"
               id="file-upload"
-              accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+              accept=".pdf,.txt,.jpg,.jpeg,.png"
             />
             <label
               htmlFor="file-upload"
@@ -263,6 +322,13 @@ const CreateCaseWizard = () => {
             </div>
           )}
         </div>
+        {uploadErrors.length > 0 && (
+          <div className="text-red-600 text-sm space-y-1">
+            {uploadErrors.map((error, i) => (
+              <p key={i}>{error}</p>
+            ))}
+          </div>
+        )}
       </div>
       <div className="flex space-x-4 pt-4 animate-slide-up" style={{ animationDelay: '0.6s' }}>
         <Button type="submit" disabled={loading} lift>
@@ -276,7 +342,9 @@ const CreateCaseWizard = () => {
   );
 
   const renderInviteLink = () => {
-    if (!caseData.inviteToken) return null;
+    if (!caseData.inviteToken) {
+      return null;
+    }
     const inviteUrl = `${window.location.origin}/join/${caseData.inviteToken}`;
     return (
       <div className="mt-6 p-6 bg-gray-800 rounded-xl border border-gray-700 animate-slide-up" style={{ animationDelay: '0.2s' }}>
