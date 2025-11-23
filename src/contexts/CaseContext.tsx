@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { useAuth } from './AuthContext';
+import { logger } from '../utils/logger';
 
 export interface Case {
   id: string;
@@ -48,103 +49,95 @@ export const CaseProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   const fetchCases = async (): Promise<void> => {
-    console.log({
-      timestamp: new Date().toISOString(),
-      operation: 'fetchCases',
-      status: 'start',
+    logger.info('fetchCases started', {
       userId: user?.id,
-      loading: loading,
+      loading,
     });
     if (!user) {
-      console.log({
-        timestamp: new Date().toISOString(),
-        operation: 'fetchCases',
-        status: 'noUser',
-        loading: loading,
-      });
-      console.log({
-        timestamp: new Date().toISOString(),
-        operation: 'fetchCases',
-        status: 'beforeSetLoadingFalse',
-        loading: loading,
-      });
+      logger.info('fetchCases: no user, skipping', { loading });
       setLoading(false);
-      console.log({
-        timestamp: new Date().toISOString(),
-        operation: 'fetchCases',
-        status: 'afterSetLoadingFalse',
-        loading: false,
-      });
       return;
     }
     try {
-      console.log({
-        timestamp: new Date().toISOString(),
-        operation: 'fetchCases',
-        status: 'beforeCaseQuery',
-        userId: user.id,
-      });
       const startTime = Date.now();
-      console.log({
-        timestamp: new Date().toISOString(),
-        operation: 'fetchCases',
-        status: 'beforeSupabaseCall',
+      logger.debug('fetchCases: initiating query', {
         userId: user.id,
+        queryParams: { limit: 50, orderBy: 'created_at', ascending: false },
       });
 
       // Add timeout to detect hanging queries
       const queryPromise = supabase
         .from('cases')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(50);
 
       const queryTimeout = parseInt(import.meta.env.VITE_QUERY_TIMEOUT_MS || '10000', 10);
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error(`Query timeout after ${queryTimeout}ms`)), queryTimeout)
-      );
+      const maxRetries = 3;
+      const baseDelay = 1000; // 1 second
 
       let data: any = null;
       let error: any = null;
-      try {
-        const result = await Promise.race([queryPromise, timeoutPromise]);
-        data = result.data;
-        error = result.error;
-      } catch (err) {
-        console.error('Query timed out or failed:', err instanceof Error ? err.message : String(err));
-        error = err;
+      let attempt = 0;
+
+      while (attempt < maxRetries) {
+        try {
+          const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error(`Query timeout after ${queryTimeout}ms`)), queryTimeout)
+          );
+
+          const result = await Promise.race([queryPromise, timeoutPromise]);
+          data = result.data;
+          error = result.error;
+          break; // Success, exit retry loop
+        } catch (err) {
+          attempt++;
+          const isTimeout = err instanceof Error && err.message.includes('timeout');
+          logger.warn('fetchCases: query attempt failed', {
+            attempt,
+            maxRetries,
+            error: err instanceof Error ? err.message : String(err),
+            isTimeout,
+            timeoutMs: queryTimeout,
+          });
+
+          if (attempt < maxRetries && isTimeout) {
+            const delay = baseDelay * Math.pow(2, attempt - 1); // Exponential backoff
+            logger.info('fetchCases: retrying after delay', { delay, attempt: attempt + 1 });
+            await new Promise(resolve => setTimeout(resolve, delay));
+          } else {
+            error = err;
+            break;
+          }
+        }
       }
       const endTime = Date.now();
-      console.log({
-        timestamp: new Date().toISOString(),
-        operation: 'fetchCases',
-        status: 'afterCaseQuery',
-        duration: endTime - startTime,
-        error: error?.message,
+      const duration = endTime - startTime;
+
+      logger.info('fetchCases: query completed', {
+        duration,
+        success: !error,
         dataCount: data?.length || 0,
+        error: error?.message,
+        timeoutMs: queryTimeout,
       });
 
       if (error) {
-        console.error('Error fetching cases:', error?.message || JSON.stringify(error));
+        logger.error('fetchCases: failed to fetch cases', {
+          error: error?.message || JSON.stringify(error),
+        });
       } else {
-        console.log('Fetched cases successfully, count:', data?.length || 0);
+        logger.debug('fetchCases: cases fetched successfully', {
+          count: data?.length || 0,
+        });
         setCases(data || []);
       }
     } catch (err) {
-      console.error('Exception in fetchCases:', err instanceof Error ? err.message : JSON.stringify(err));
+      logger.error('fetchCases: unexpected exception', {
+        error: err instanceof Error ? err.message : JSON.stringify(err),
+      });
     }
-    console.log({
-      timestamp: new Date().toISOString(),
-      operation: 'fetchCases',
-      status: 'beforeSetLoadingFalse',
-      loading: loading,
-    });
     setLoading(false);
-    console.log({
-      timestamp: new Date().toISOString(),
-      operation: 'fetchCases',
-      status: 'afterSetLoadingFalse',
-      loading: false,
-    });
   };
 
   useEffect(() => {

@@ -95,8 +95,8 @@ const MediationRoom = () => {
     }
 
     try {
-      // Parallel fetch for better performance
-      const [messagesResult, participantsResult, contextsResult, agreementResult] = await Promise.all([
+      // Parallel fetch for better performance with timeout protection
+      const fetchPromise = Promise.all([
         supabase
           .from('messages')
           .select('*')
@@ -116,6 +116,13 @@ const MediationRoom = () => {
           .eq('case_id', caseId)
           .single()
       ]);
+
+      const queryTimeout = parseInt(import.meta.env.VITE_QUERY_TIMEOUT_MS || '10000', 10);
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error(`MediationRoom fetchData timeout after ${queryTimeout}ms`)), queryTimeout)
+      );
+
+      const [messagesResult, participantsResult, contextsResult, agreementResult] = await Promise.race([fetchPromise, timeoutPromise]);
 
       if (messagesResult.error) {
         throw messagesResult.error;
