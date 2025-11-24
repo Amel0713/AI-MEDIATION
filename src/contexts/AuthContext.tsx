@@ -28,45 +28,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Ensure a user profile exists in the database after authentication
-  const ensureProfileExists = async (user: User) => {
-    if (!user) return;
-
-    logger.debug('Starting ensureProfileExists', { userId: user.id });
-
-    try {
-      // Check if profile already exists
-      const { error } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', user.id)
-        .single();
-
-      // If profile doesn't exist (PGRST116 = no rows), create it
-      if (error && error.code === 'PGRST116') {
-        logger.debug('Profile not found, creating new profile', { userId: user.id });
-        const { error: insertError } = await supabase
-          .from('profiles')
-          .insert({
-            id: user.id,
-            email: user.email,
-            full_name: user.user_metadata?.full_name || null,
-          })
-          .select();
-        if (insertError) {
-          logger.error('Failed to create user profile', { userId: user.id, error: insertError.message });
-        } else {
-          logger.info('User profile created successfully', { userId: user.id });
-        }
-      } else if (!error) {
-        logger.debug('User profile already exists', { userId: user.id });
-      } else {
-        logger.warn('Unexpected error checking profile', { userId: user.id, error: error.message });
-      }
-    } catch (err) {
-      logger.error('Exception in ensureProfileExists', { userId: user.id, error: err });
-    }
-  };
 
   // Initialize authentication state and set up auth state listener
   useEffect(() => {
@@ -75,10 +36,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       logger.debug('Getting initial session');
       const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
-      if (session?.user) {
-        logger.debug('Ensuring profile exists for session user', { userId: session.user.id });
-        await ensureProfileExists(session.user);
-      }
       setLoading(false);
       logger.info('Initial session loaded', { hasUser: !!session?.user });
     };
@@ -90,10 +47,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       async (_event, session) => {
         logger.info('Auth state changed', { event: _event, hasSession: !!session, userId: session?.user?.id });
         setUser(session?.user ?? null);
-        if (session?.user) {
-          logger.debug('Ensuring profile exists for auth state change', { userId: session.user.id });
-          await ensureProfileExists(session.user);
-        }
         setLoading(false);
       }
     );
