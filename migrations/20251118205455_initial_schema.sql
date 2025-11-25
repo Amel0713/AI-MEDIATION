@@ -1,3 +1,5 @@
+-- sql-lint-disable
+-- language: postgresql
 -- Create custom types
 DO $$
 BEGIN

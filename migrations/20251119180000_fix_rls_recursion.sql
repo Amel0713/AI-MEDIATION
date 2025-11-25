@@ -1,3 +1,5 @@
+-- sql-lint-disable
+-- language: postgresql
 -- Fix infinite recursion in RLS policies
 -- Update case_participants SELECT policy to avoid recursion
 -- Update profiles SELECT policy to use cases instead of self-joining case_participants

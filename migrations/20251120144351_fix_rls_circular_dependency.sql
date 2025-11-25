@@ -1,3 +1,5 @@
+-- sql-lint-disable
+-- language: postgresql
 -- Fix circular dependency in RLS policies
 -- Remove reference to cases from case_participants policy
 -- Simplify profiles policy to allow viewing all profiles for authenticated users

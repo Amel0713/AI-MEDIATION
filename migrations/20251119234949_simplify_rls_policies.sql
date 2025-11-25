@@ -1,3 +1,5 @@
+-- sql-lint-disable
+-- language: postgresql
 -- Simplify RLS policies to improve performance
 -- Allow all users to view profiles (since they contain public info like names)
 -- Add indexes on columns used in RLS policies

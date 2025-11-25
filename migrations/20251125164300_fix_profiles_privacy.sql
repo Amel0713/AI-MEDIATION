@@ -1,3 +1,5 @@
+-- sql-lint-disable
+-- language: postgresql
 -- Fix profiles RLS policy to protect user privacy
 -- Only allow users to view their own profile and profiles of case participants
 

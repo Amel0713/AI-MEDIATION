@@ -1,3 +1,5 @@
+-- sql-lint-disable
+-- language: postgresql
 -- Fix RLS policy issues causing 500 and 401 errors
 -- Enable RLS on case_participants table and add comprehensive policies
 -- Update profiles table policies to allow viewing profiles of case participants

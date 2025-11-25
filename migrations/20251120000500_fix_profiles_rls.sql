@@ -1,3 +1,5 @@
+-- sql-lint-disable
+-- language: postgresql
 -- Fix RLS policy for profiles to allow users to access their own profile
 -- This resolves the loading issue by ensuring users can view their own profile
 

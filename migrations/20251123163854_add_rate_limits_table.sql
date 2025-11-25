@@ -1,5 +1,5 @@
 -- sql-lint-disable
--- language: pgsql
+-- language: postgresql
 -- Create rate_limits table for persistent rate limiting
 CREATE TABLE rate_limits (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,

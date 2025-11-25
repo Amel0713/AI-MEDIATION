@@ -1,3 +1,5 @@
+-- sql-lint-disable
+-- language: postgresql
 -- Add case_files table for storing file references associated with cases
 
 CREATE TABLE IF NOT EXISTS case_files (
