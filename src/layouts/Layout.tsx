@@ -1,9 +1,10 @@
 /* eslint-disable no-console */
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/Button';
 
-const Layout = () => {
+const Layout = ({ children }: { children: React.ReactNode }) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -51,7 +52,7 @@ const Layout = () => {
         </div>
       </header>
       <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <Outlet />
+        {children}
       </main>
       <footer className="bg-black border-t border-gray-700 mt-20">
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
